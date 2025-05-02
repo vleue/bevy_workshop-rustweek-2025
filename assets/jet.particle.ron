@@ -1,0 +1,10 @@
+(
+    spawn_rate: 0.1,
+    spawn_amount: 1,
+    emission_shape: Point,
+    lifetime: (1.0, 0.0),
+    linear_speed: Some((100, 0.1)),
+    direction: Some(((0, -1), 0.1)),
+    scale: Some((3., 1.)),
+    color: Some((red: 3.0, green: 3.0, blue: 0.0, alpha: 1.0)),
+)

@@ -1,0 +1,12 @@
+<script>
+    if ("{{ title }}" == "Target Game - Bevy Workshop") {
+        window.onload = function () {
+            setTimeout(() => {
+                let canvas = document.createElement("canvas");
+                canvas.setAttribute("id", "game");
+                document.getElementById("content").appendChild(canvas);
+                console.log("canvas created");
+            }, 100);
+        };
+    }
+</script>
