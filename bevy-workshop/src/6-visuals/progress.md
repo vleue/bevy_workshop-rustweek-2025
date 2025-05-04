@@ -10,6 +10,10 @@
   - Adding it to the app with the [`Material2dPlugin`](https://docs.rs/bevy/0.16.0/bevy/sprite/struct.Material2dPlugin.html)
   - With the [`Mesh2d`](https://docs.rs/bevy/0.16.0/bevy/prelude/struct.Mesh2d.html) component to define the shape
   - And the [`MeshMaterial2d`](https://docs.rs/bevy/0.16.0/bevy/prelude/struct.MeshMaterial2d.html) component to define the material
+- Enabling bloom
+  - TODO
+- And getting a little more effects with particles
+  - TODO
 
 ## Going Further
 
