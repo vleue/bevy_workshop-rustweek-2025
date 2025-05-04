@@ -22,9 +22,14 @@ Display engine jets behind the ship when moving forward.
 
 Tips:
 
+- Load the new sprite in `GameAssets`. `fire07.png` is a good sprite for jets
 - Spawn the jets as children sprite of the player entity with the `children!` macro
-- When the player moves forward, make the sprite visible and start or refresh a timer
-- When the timer expires, make the sprite invisible
+  - Make it invisible with the `Visibility::Hidden` component
+  - A good starting position is `Vec3::new(0.0, -40.0, 0.0)`
+- Toggle sprite visibility when the ship moves forward, when the player presses the `W` key
+  - You can get children of an entity with the `Children` component
+  - Add a new query to the `control_player` that can modify the `Visibility` component
+  - When `W` is pressed, query the `Visibility` component of the first child of the `Player` entity
 
 ## Player Acceleration
 

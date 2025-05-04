@@ -9,13 +9,16 @@ pub fn game_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Game), display_level)
         .add_systems(
             FixedUpdate,
-            (control_player, inertia).run_if(in_state(GameState::Game)),
+            (control_player, move_player, inertia).run_if(in_state(GameState::Game)),
         )
         .add_systems(Update, collision.run_if(in_state(GameState::Game)));
 }
 
 #[derive(Component)]
 struct Player;
+
+#[derive(Component)]
+struct PlayerVelocity(Vec2);
 
 #[derive(Component)]
 struct Asteroid {
@@ -27,7 +30,13 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     commands.spawn((
         Sprite::from_image(game_assets.player_ship.clone()),
         Player,
+        PlayerVelocity(Vec2::ZERO),
         StateScoped(GameState::Game),
+        children![(
+            Sprite::from_image(game_assets.jets.clone()),
+            Transform::from_xyz(0.0, -40.0, -1.0),
+            Visibility::Hidden,
+        )],
     ));
 
     let mut rng = rand::thread_rng();
@@ -47,9 +56,10 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
 
 fn control_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut player: Query<&mut Transform, With<Player>>,
+    mut player: Query<(&mut Transform, &mut PlayerVelocity, &Children), With<Player>>,
+    mut visibility: Query<&mut Visibility>,
 ) -> Result {
-    let mut player_transform = player.single_mut()?;
+    let (mut player_transform, mut player_velocity, children) = player.single_mut()?;
     if keyboard_input.pressed(KeyCode::KeyA) {
         player_transform.rotate_z(FRAC_PI_8 / 4.0);
     }
@@ -57,10 +67,21 @@ fn control_player(
         player_transform.rotate_z(-FRAC_PI_8 / 4.0);
     }
     if keyboard_input.pressed(KeyCode::KeyW) {
-        let forward = player_transform.local_y();
-        player_transform.translation += forward * 5.0;
+        let forward = player_transform.local_y().xy();
+        player_velocity.0 = forward;
+        *visibility.get_mut(children[0])? = Visibility::Visible;
+    } else {
+        visibility
+            .get_mut(children[0])?
+            .set_if_neq(Visibility::Hidden);
     }
     Ok(())
+}
+
+fn move_player(mut player: Query<(&mut Transform, &PlayerVelocity)>) {
+    for (mut player_transform, player_velocity) in player.iter_mut() {
+        player_transform.translation += player_velocity.0.extend(0.0) * 5.0;
+    }
 }
 
 fn inertia(mut asteroids: Query<(&mut Transform, &Asteroid)>) {
