@@ -16,7 +16,7 @@ Tips:
 
 - Avoid spawning an asteroid on top of the player
 
-## Display informations about the level
+## Display information about the level
 
 TODO
 
