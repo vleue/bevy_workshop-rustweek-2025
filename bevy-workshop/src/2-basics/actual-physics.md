@@ -207,6 +207,8 @@ This is not the idiomatic way to do it. Avian send trigger events that can be ca
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Player;
+# #[derive(Component)]
+# struct Explosion(Timer);
 # #[derive(Resource)]
 # struct GameAssets {
 #     explosion: Handle<Image>,
