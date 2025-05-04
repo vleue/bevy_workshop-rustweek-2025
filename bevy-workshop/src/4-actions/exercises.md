@@ -8,6 +8,14 @@ git checkout 08-player-actions
 
 Let's review what was changed: <https://github.com/vleue/bevy_workshop-rustweek-2025/compare/07-level-loading..08-player-actions>
 
+## Idiomatic Ship Collision Detection
+
+TODO
+
+Tips:
+
+- Remove the existing `collision` system, and replace it with an observer on the ship entity
+
 ## Can Destroy Asteroids
 
 TODO
