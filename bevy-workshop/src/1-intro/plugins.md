@@ -25,7 +25,7 @@ fn main() {
 enum GameState {
     #[default]
     Splash,
-    Menu,
+    StartMenu,
 }
 
 mod splash {
@@ -85,7 +85,7 @@ mod splash {
         time: Res<Time>,
     ) {
         if timer.0.tick(time.delta()).just_finished() {
-            next.set(GameState::Menu);
+            next.set(GameState::StartMenu);
         }
     }
 }

@@ -27,7 +27,7 @@ fn main() {
 enum GameState {
     #[default]
     Splash,
-    Menu,
+    StartMenu,
 }
 
 #[derive(Resource)]
@@ -73,7 +73,7 @@ fn switch_to_menu(
     time: Res<Time>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
-        next.set(GameState::Menu);
+        next.set(GameState::StartMenu);
     }
 }
 ```

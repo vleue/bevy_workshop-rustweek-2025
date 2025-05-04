@@ -93,7 +93,7 @@ fn collision(
             .translation
             .distance(player_transform.translation);
         if distance < (asteroid_radius + player_radius) {
-            next_state.set(GameState::Splash);
+            next_state.set(GameState::StartMenu);
         }
     }
 
