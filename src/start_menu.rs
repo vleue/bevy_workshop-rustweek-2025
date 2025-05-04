@@ -8,8 +8,6 @@ pub fn menu_plugin(app: &mut App) {
 }
 
 fn display_title(mut commands: Commands) {
-    commands.spawn(Camera2d);
-
     commands.spawn((
         Node {
             width: Val::Percent(100.0),

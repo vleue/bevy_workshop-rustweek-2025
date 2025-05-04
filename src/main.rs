@@ -1,3 +1,4 @@
+use avian2d::{PhysicsPlugins, prelude::Gravity};
 use bevy::prelude::*;
 
 mod game;
@@ -17,6 +18,8 @@ fn main() {
         }))
         .init_state::<GameState>()
         .enable_state_scoped_entities::<GameState>()
+        .add_plugins(PhysicsPlugins::default())
+        .insert_resource(Gravity::ZERO)
         .add_plugins((
             splash::splash_plugin,
             start_menu::menu_plugin,
