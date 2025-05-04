@@ -16,6 +16,7 @@ Tips:
 
 - new action to fire lasers
 - new sprite for lasers
+- despawn lasers after a certain time
 - collisions between asteroids and lasers
 - explodes asteroids
 
