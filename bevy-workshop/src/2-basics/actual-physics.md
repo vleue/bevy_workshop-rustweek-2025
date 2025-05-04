@@ -62,8 +62,10 @@ And that's it! As a bonus, now asteroids will bounce off each other.
 # use std::f32::consts::TAU;
 # use bevy::prelude::*;
 # use avian2d::prelude::*;
+# use crate::rand::Rng;
 # #[derive(Component)]
 # struct Asteroid;
+# #[derive(Resource)]
 # struct GameAssets {
 #     asteroid: Handle<Image>,
 # }
@@ -109,6 +111,7 @@ Another component we'll add is `AngularDamping`. As the ship is in space, once i
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Player;
+# #[derive(Resource)]
 # struct GameAssets {
 #     player_ship: Handle<Image>,
 #     jets: Handle<Image>,
@@ -204,6 +207,7 @@ This is not the idiomatic way to do it. Avian send trigger events that can be ca
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Player;
+# #[derive(Resource)]
 # struct GameAssets {
 #     explosion: Handle<Image>,
 # }

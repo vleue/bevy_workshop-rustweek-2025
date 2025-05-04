@@ -13,6 +13,7 @@ We'll spawn 4 asteroids, at fixed positions for now.
 # struct Player;
 # #[derive(Component)]
 # struct Asteroid;
+# #[derive(Resource)]
 # struct GameAssets {
 #     asteroid: Handle<Image>,
 # }
