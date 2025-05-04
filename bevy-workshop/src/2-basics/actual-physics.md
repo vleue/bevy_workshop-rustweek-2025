@@ -58,13 +58,24 @@ And that's it! As a bonus, now asteroids will bounce off each other.
 ```rust
 # extern crate bevy;
 # extern crate avian2d;
+# extern crate rand;
+# use std::f32::consts::TAU;
 # use bevy::prelude::*;
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Asteroid;
+# struct GameAssets {
+#     asteroid: Handle<Image>,
+# }
+# #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
+# enum GameState {
+#     #[default]
+#     Game,
+# }
 fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     // Same player spawning
 
+    let mut rng = rand::thread_rng();
     for (x, y) in [(1., 1.), (-1., 1.), (-1., -1.), (1., -1.)] {
         commands.spawn((
             Sprite::from_image(game_assets.asteroid.clone()),
@@ -98,6 +109,15 @@ Another component we'll add is `AngularDamping`. As the ship is in space, once i
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Player;
+# struct GameAssets {
+#     player_ship: Handle<Image>,
+#     jets: Handle<Image>,
+# }
+# #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
+# enum GameState {
+#     #[default]
+#     Game,
+# }
 fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     commands.spawn((
         Sprite::from_image(game_assets.player_ship.clone()),
@@ -105,7 +125,6 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
         Collider::circle(40.0),
         AngularDamping(5.0),
         Player,
-        // PlayerVelocity(Vec2::ZERO),
         StateScoped(GameState::Game),
         children![(
             Sprite::from_image(game_assets.jets.clone()),
@@ -127,7 +146,6 @@ And when reacting to user input, we'll modify the `AngularVelocity` and `LinearV
 # use avian2d::prelude::*;
 # #[derive(Component)]
 # struct Player;
-
 fn control_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player: Query<
@@ -180,6 +198,20 @@ This is not the idiomatic way to do it. Avian send trigger events that can be ca
 </div>
 
 ```rust
+# extern crate bevy;
+# extern crate avian2d;
+# use bevy::prelude::*;
+# use avian2d::prelude::*;
+# #[derive(Component)]
+# struct Player;
+# struct GameAssets {
+#     explosion: Handle<Image>,
+# }
+# #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
+# enum GameState {
+#     #[default]
+#     Game,
+# }
 fn collision(
     collisions: Collisions,
     player: Query<(&Transform, Entity), With<Player>>,

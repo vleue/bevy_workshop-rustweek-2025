@@ -47,7 +47,7 @@ Now that we have a texture atlas, we can use it to display a sprite for our play
 # struct Ground;
 # #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
 # enum GameState { #[default] Game }
-fn display_level(mut commands: Commands, assets: Res<GameAssets>) {
+fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     commands.spawn((
         Sprite::from_image(game_assets.player_ship.clone()),
         Player,

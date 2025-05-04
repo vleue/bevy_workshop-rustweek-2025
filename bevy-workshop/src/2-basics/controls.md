@@ -5,6 +5,7 @@ We'll control our player with the `A` and `D` keys on the keyboard to turn, and 
 ```rust,no_run
 # extern crate bevy;
 # use bevy::prelude::*;
+# use std::f32::consts::FRAC_PI_8;
 # #[derive(Component)]
 # struct Player;
 fn control_player(

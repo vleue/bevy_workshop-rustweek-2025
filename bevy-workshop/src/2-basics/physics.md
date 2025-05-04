@@ -8,14 +8,19 @@ We'll spawn 4 asteroids, at fixed positions for now.
 
 ```rust,no_run
 # extern crate bevy;
+# use bevy::prelude::*;
 # #[derive(Component)]
 # struct Player;
 # #[derive(Component)]
 # struct Asteroid;
-# use bevy::{
-#     prelude::*,
-# };
-
+# struct GameAssets {
+#     asteroid: Handle<Image>,
+# }
+# #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
+# enum GameState {
+#     #[default]
+#     Game,
+# }
 fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     // Same player spawning
 
@@ -38,6 +43,12 @@ One of the easiest way to test collisions is to consider everything is round, an
 Let's get the position of the player, and check the distance with every asteroid.
 
 ```rust,no_run
+# extern crate bevy;
+# use bevy::prelude::*;
+# #[derive(Component)]
+# struct Player;
+# #[derive(Component)]
+# struct Asteroid;
 fn collision(
     asteroids: Query<&Transform, With<Asteroid>>,
     player: Query<&Transform, With<Player>>,
@@ -71,6 +82,12 @@ An easy way to debug what is happening on screen are gizmos. They make it possib
 We'll draw circles around the different objects, with their radius.
 
 ```rust,no_run
+# extern crate bevy;
+# use bevy::prelude::*;
+# #[derive(Component)]
+# struct Player;
+# #[derive(Component)]
+# struct Asteroid;
 fn collision(
     asteroids: Query<&Transform, With<Asteroid>>,
     player: Query<&Transform, With<Player>>,
