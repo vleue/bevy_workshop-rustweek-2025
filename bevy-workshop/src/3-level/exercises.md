@@ -10,11 +10,13 @@ Let's review what was changed: <https://github.com/vleue/bevy_workshop-rustweek-
 
 ## Spawn the correct number of asteroids
 
-TODO
+Spawn all the asteroids in the level
 
 Tips:
 
 - Avoid spawning an asteroid on top of the player
+  - Find a random position in the arena
+  - Ensure the distance from the center is more than the radius of the player plus a safe margin
 
 ## Display information about the level
 

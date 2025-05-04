@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{GameAssets, GameState};
+use crate::{GameAssets, GameState, LoadedLevel};
 
 pub fn splash_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Splash), (display_title, load_assets))
@@ -60,5 +60,8 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
         asteroid: asset_server.load("meteorBrown_big1.png"),
         jets: asset_server.load("fire07.png"),
         explosion: asset_server.load("explosion00.png"),
+    });
+    commands.insert_resource(LoadedLevel {
+        level: asset_server.load("level.bw"),
     });
 }

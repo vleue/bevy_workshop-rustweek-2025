@@ -10,22 +10,24 @@ Accessing the data from the [`Assets<T>`](https://docs.rs/bevy/0.16.0/bevy/asset
 # extern crate bevy;
 # use bevy::prelude::*;
 # #[derive(Asset, TypePath)]
-# struct Level {pub tiles: Vec<Vec<Tile>>}
-# enum Tile {Empty, Ground}
+# struct Level {width: u32, height: u32, asteroids: u32, lives: u32}
 # #[derive(Resource)]
 # struct GameAssets {
-#     player_image: Handle<Image>,
-#     player_layout: Handle<TextureAtlasLayout>,
-#     ground_image: Handle<Image>,
-#     ground_layout: Handle<TextureAtlasLayout>,
 # }
 # #[derive(Resource)]
 # pub struct LoadedLevel { pub level: Handle<Level> }
 # #[derive(Component)]
-# struct Player;
-# #[derive(Component)]
-# struct Ground;
+# struct Asteroid;
 # #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
 # enum GameState { #[default] Game }
+fn display_level(
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+    loaded_level: Res<LoadedLevel>,
+    levels: Res<Assets<Level>>,
+) {
+    let level = levels.get(&loaded_level.level).unwrap();
 
+    // do something with the level
+}
 ```

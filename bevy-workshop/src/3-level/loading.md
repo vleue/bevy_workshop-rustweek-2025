@@ -2,28 +2,29 @@
 
 ## Level Format
 
-TODO:
+We'll load the level information from a basic text file. The information we want from it are:
 
-- number of asteroids
-- player lives
+- width and height of the level
+- number of asteroids to spawn
+- number of lives of the player
 
 ## Asset Type
 
-To match the basic level format, we'll use a basic struct that will hold two `u32`s. The struct must derive the [`Asset`](https://docs.rs/bevy/0.16.0/bevy/asset/trait.Asset.html) trait.
+To match the basic level format, we'll use a basic struct that will hold four `u32`s. The struct must derive the [`Asset`](https://docs.rs/bevy/0.16.0/bevy/asset/trait.Asset.html) trait.
 
 ```rust
 # extern crate bevy;
 # use bevy::prelude::*;
 #[derive(Asset, TypePath)]
 pub struct Level {
+    pub width: u32,
+    pub height: u32,
     pub asteroids: u32,
     pub lives: u32,
 }
 ```
 
 ## Asset Loader
-
-TODO
 
 To load this format, we'll read the file character by character, then choose the right tile depending on the character. Bevy expects custom asset loader to implement the trait [`AssetLoader`](https://docs.rs/bevy/0.16.0/bevy/asset/trait.AssetLoader.html).
 
@@ -33,7 +34,7 @@ To load this format, we'll read the file character by character, then choose the
 # use bevy::{asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext}, prelude::*};
 # use thiserror::Error;
 # #[derive(Asset, TypePath)]
-# struct Level {asteroids: u32, lives: u32}
+# struct Level {width: u32, height: u32, asteroids: u32, lives: u32}
 #[derive(Default)]
 struct LevelLoader;
 
@@ -60,6 +61,14 @@ impl AssetLoader for LevelLoader {
 
         let mut lines = buf.lines();
         Ok(Level {
+            width: lines
+                .next()
+                .and_then(|s| s.parse().ok())
+                .ok_or(LevelLoaderError::FormatError)?,
+            height: lines
+                .next()
+                .and_then(|s| s.parse().ok())
+                .ok_or(LevelLoaderError::FormatError)?,
             asteroids: lines
                 .next()
                 .and_then(|s| s.parse().ok())
@@ -87,8 +96,7 @@ Custom asset formats and loaders must be initiated in the application with [`App
 # use bevy::{asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext}, prelude::*};
 # use thiserror::Error;
 # #[derive(Asset, TypePath)]
-# struct Level {pub tiles: Vec<Vec<Tile>>}
-# enum Tile {Empty, Ground}
+# struct Level {width: u32, height: u32, asteroids: u32, lives: u32}
 # #[derive(Default)]
 # struct LevelLoader;
 # #[derive(Debug, Error)]
@@ -117,8 +125,7 @@ Now we can load the asset file like the sprites we're already using, and keeping
 # extern crate bevy;
 # use bevy::{asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext}, prelude::*};
 # #[derive(Asset, TypePath)]
-# struct Level {pub tiles: Vec<Vec<Tile>>}
-# enum Tile {Empty, Ground}
+# struct Level {width: u32, height: u32, asteroids: u32, lives: u32}
 #[derive(Resource)]
 pub struct LoadedLevel {
     pub level: Handle<Level>,

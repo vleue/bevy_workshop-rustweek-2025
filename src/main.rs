@@ -1,5 +1,6 @@
 use avian2d::{PhysicsPlugins, prelude::Gravity};
 use bevy::prelude::*;
+use level::Level;
 
 mod game;
 mod level;
@@ -24,6 +25,7 @@ fn main() {
             splash::splash_plugin,
             start_menu::menu_plugin,
             game::game_plugin,
+            level::level_loader_plugin,
         ))
         .run();
 }
@@ -42,4 +44,9 @@ struct GameAssets {
     asteroid: Handle<Image>,
     jets: Handle<Image>,
     explosion: Handle<Image>,
+}
+
+#[derive(Resource)]
+pub struct LoadedLevel {
+    pub level: Handle<Level>,
 }

@@ -6,8 +6,14 @@ use thiserror::Error;
 
 #[derive(Asset, TypePath)]
 pub struct Level {
+    pub width: u32,
+    pub height: u32,
     pub asteroids: u32,
     pub lives: u32,
+}
+
+pub fn level_loader_plugin(app: &mut App) {
+    app.init_asset::<Level>().init_asset_loader::<LevelLoader>();
 }
 
 #[derive(Default)]
@@ -36,6 +42,14 @@ impl AssetLoader for LevelLoader {
 
         let mut lines = buf.lines();
         Ok(Level {
+            width: lines
+                .next()
+                .and_then(|s| s.parse().ok())
+                .ok_or(LevelLoaderError::FormatError)?,
+            height: lines
+                .next()
+                .and_then(|s| s.parse().ok())
+                .ok_or(LevelLoaderError::FormatError)?,
             asteroids: lines
                 .next()
                 .and_then(|s| s.parse().ok())

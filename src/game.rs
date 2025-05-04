@@ -1,10 +1,10 @@
-use std::f32::consts::{FRAC_PI_8, TAU};
+use std::f32::consts::TAU;
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{GameAssets, GameState};
+use crate::{GameAssets, GameState, LoadedLevel, level::Level};
 
 pub fn game_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Game), display_level)
@@ -35,7 +35,14 @@ struct Asteroid;
 #[derive(Component)]
 struct Explosion(Timer);
 
-fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
+fn display_level(
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+    loaded_level: Res<LoadedLevel>,
+    levels: Res<Assets<Level>>,
+) {
+    let level = levels.get(&loaded_level.level).unwrap();
+
     commands.spawn((
         Sprite::from_image(game_assets.player_ship.clone()),
         RigidBody::Dynamic,
@@ -52,15 +59,27 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     ));
 
     let mut rng = rand::thread_rng();
+    for (x, y) in std::iter::repeat(())
+        .filter_map(|_| {
+            let x = rng.gen_range(-(level.width as f32) / 2.0..(level.width as f32) / 2.0);
+            let y = rng.gen_range(-(level.height as f32) / 2.0..(level.height as f32) / 2.0);
 
-    for (x, y) in [(1., 1.), (-1., 1.), (-1., -1.), (1., -1.)] {
+            if Vec2::new(x, y).distance(Vec2::ZERO) < 200.0 {
+                return None;
+            }
+
+            Some((x, y))
+        })
+        .take(level.asteroids as usize)
+        .collect::<Vec<_>>()
+    {
         commands.spawn((
             Sprite::from_image(game_assets.asteroid.clone()),
-            Transform::from_xyz(300.0 * x, 200.0 * y, 0.0),
+            Transform::from_xyz(x, y, 0.0),
             RigidBody::Dynamic,
             Collider::circle(45.0),
-            LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0)),
-            AngularVelocity(rng.gen_range(-1.5..1.5)),
+            LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(50.0..100.0)),
+            AngularVelocity(rng.gen_range(-2.0..2.0)),
             // Asteroid {
             //     direction: Vec2::from_angle(rng.gen_range(0.0..TAU)),
             //     speed: rng.gen_range(0.5..2.0),
@@ -69,6 +88,23 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
             StateScoped(GameState::Game),
         ));
     }
+    // let mut rng = rand::thread_rng();
+    // for (x, y) in [(1., 1.), (-1., 1.), (-1., -1.), (1., -1.)] {
+    //     commands.spawn((
+    //         Sprite::from_image(game_assets.asteroid.clone()),
+    //         Transform::from_xyz(300.0 * x, 200.0 * y, 0.0),
+    //         RigidBody::Dynamic,
+    //         Collider::circle(45.0),
+    //         LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0)),
+    //         AngularVelocity(rng.gen_range(-1.5..1.5)),
+    //         // Asteroid {
+    //         //     direction: Vec2::from_angle(rng.gen_range(0.0..TAU)),
+    //         //     speed: rng.gen_range(0.5..2.0),
+    //         // },
+    //         Asteroid,
+    //         StateScoped(GameState::Game),
+    //     ));
+    // }
 }
 
 // fn control_player(
