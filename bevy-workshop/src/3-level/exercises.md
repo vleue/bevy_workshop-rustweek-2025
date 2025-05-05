@@ -29,6 +29,11 @@ Tips:
 - On collision, decrement the number of lives
 - After a collision, wait for a few seconds before respawning the player
 - You can move the code spawning the player to a separate function to be able to call it either at game start or on respawn
+- Decide where to respawn:
+  - At the game starting point
+  - At the player last position
+  - At a random position in the arena
+  - The respawn point shouldn't have an asteroid or the player would die again immediately
 - If the number of lives is 0, game over
 
 ## Display information about the level
