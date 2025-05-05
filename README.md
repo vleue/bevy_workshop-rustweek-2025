@@ -21,3 +21,4 @@ TO ADD:
 - fuel consumption
 - laser overheating
 - firing accuracy
+- link a lot more to rustdoc

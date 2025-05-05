@@ -28,7 +28,7 @@ Tips:
 - Add the number of lives as a resource at the start of the game
 - On collision, decrement the number of lives
 - After a collision, wait for a few seconds before respawning the player
-- You cna move the code spawning the player to a separate function to be able to call it either at game start or on respawn
+- You can move the code spawning the player to a separate function to be able to call it either at game start or on respawn
 - If the number of lives is 0, game over
 
 ## Display information about the level
