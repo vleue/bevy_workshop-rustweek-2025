@@ -14,34 +14,39 @@ Spawn all the asteroids in the level
 
 Tips:
 
+- Find a random position in the arena
 - Avoid spawning an asteroid on top of the player
   - Find a random position in the arena
   - Ensure the distance from the center is more than the radius of the player plus a safe margin
 
-## Display information about the level
+## Player can have multiple lives
 
-TODO
+Don't return to the menu on the first collision. Instead, do it when the player doesn't have any live remaining
 
 Tips:
+
+- Add the number of lives as a resource at the start of the game
+- On collision, decrement the number of lives
+- After a collision, wait for a few seconds before respawning the player
+- You cna move the code spawning the player to a separate function to be able to call it either at game start or on respawn
+- If the number of lives is 0, game over
+
+## Display information about the level
+
+Let's display some information about the current game:
 
 - Number of asteroids remaining
 - Lives remaining
 - Time spent in the level
 
-## Player can have multiple lives
-
-TODO
-
 Tips:
 
-- Add the number of lives to a component
-- On collision, decrement the number of lives
-- After a collision, wait for a few seconds before respawning the player
-- If the number of lives is 0, game over
-
-## Try Hot Reloading
-
-Tips:
-
-- It needs to enable a feature on Bevy: `file_watcher`
-- Check if the asset changed, then despawn the level and respawn it from the updated file
+- Start a new plugin `hud` (for heads up display)
+- Add a system when entering the `Game` state that will display some text and start a `StopWatch`
+  - Add a `StopWatch` as a resource
+  - Spawn an entity with a `Text` component
+  - Spawn children with a `TextSpan` component. Text spans make it easy to change the style of the text, or to target a specific part for editing
+- Add a system that will update the text
+  - Target the entity with the `Text` component
+  - Use the `TextWriter` system parameter to update the text
+  - And tick the stopwatch

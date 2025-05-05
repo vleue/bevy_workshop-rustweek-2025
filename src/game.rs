@@ -22,11 +22,14 @@ pub fn game_plugin(app: &mut App) {
 #[derive(Component)]
 struct Player;
 
+#[derive(Resource)]
+pub struct LivesRemaining(pub u32);
+
 // #[derive(Component)]
 // struct PlayerVelocity(Vec2);
 
 #[derive(Component)]
-struct Asteroid;
+pub struct Asteroid;
 // {
 //     direction: Vec2,
 //     speed: f32,
@@ -43,20 +46,23 @@ fn display_level(
 ) {
     let level = levels.get(&loaded_level.level).unwrap();
 
-    commands.spawn((
-        Sprite::from_image(game_assets.player_ship.clone()),
-        RigidBody::Dynamic,
-        Collider::circle(40.0),
-        AngularDamping(5.0),
-        Player,
-        // PlayerVelocity(Vec2::ZERO),
-        StateScoped(GameState::Game),
-        children![(
-            Sprite::from_image(game_assets.jets.clone()),
-            Transform::from_xyz(0.0, -40.0, -1.0),
-            Visibility::Hidden,
-        )],
-    ));
+    commands.insert_resource(LivesRemaining(level.lives - 1));
+
+    // commands.spawn((
+    //     Sprite::from_image(game_assets.player_ship.clone()),
+    //     RigidBody::Dynamic,
+    //     Collider::circle(40.0),
+    //     AngularDamping(5.0),
+    //     Player,
+    //     // PlayerVelocity(Vec2::ZERO),
+    //     StateScoped(GameState::Game),
+    //     children![(
+    //         Sprite::from_image(game_assets.jets.clone()),
+    //         Transform::from_xyz(0.0, -40.0, -1.0),
+    //         Visibility::Hidden,
+    //     )],
+    // ));
+    spawn_player(&mut commands, game_assets.as_ref());
 
     let mut rng = rand::thread_rng();
     for (x, y) in std::iter::repeat(())
@@ -245,13 +251,39 @@ fn collision(
 // }
 
 fn tick_explosion(
-    mut explosions: Query<&mut Explosion>,
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+    mut lives_remaining: ResMut<LivesRemaining>,
+    mut explosions: Query<(Entity, &mut Explosion)>,
     time: Res<Time>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for mut timer in explosions.iter_mut() {
+    for (entity, mut timer) in explosions.iter_mut() {
         if timer.0.tick(time.delta()).just_finished() {
-            next_state.set(GameState::StartMenu);
+            if lives_remaining.0 == 0 {
+                next_state.set(GameState::StartMenu);
+            } else {
+                commands.entity(entity).despawn();
+                lives_remaining.0 -= 1;
+                spawn_player(&mut commands, game_assets.as_ref());
+            }
         }
     }
+}
+
+fn spawn_player(commands: &mut Commands, game_assets: &GameAssets) {
+    commands.spawn((
+        Sprite::from_image(game_assets.player_ship.clone()),
+        RigidBody::Dynamic,
+        Collider::circle(40.0),
+        AngularDamping(5.0),
+        Player,
+        // PlayerVelocity(Vec2::ZERO),
+        StateScoped(GameState::Game),
+        children![(
+            Sprite::from_image(game_assets.jets.clone()),
+            Transform::from_xyz(0.0, -40.0, -1.0),
+            Visibility::Hidden,
+        )],
+    ));
 }

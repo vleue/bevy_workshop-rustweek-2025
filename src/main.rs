@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use level::Level;
 
 mod game;
+mod hud;
 mod level;
 mod splash;
 mod start_menu;
@@ -26,6 +27,7 @@ fn main() {
             start_menu::menu_plugin,
             game::game_plugin,
             level::level_loader_plugin,
+            hud::hud_plugin,
         ))
         .run();
 }
