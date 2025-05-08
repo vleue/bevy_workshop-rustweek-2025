@@ -10,23 +10,31 @@ Let's review what was changed: <https://github.com/vleue/bevy_workshop-rustweek-
 
 ## Idiomatic Ship Collision Detection
 
-TODO
+Now we can remove the `collision` system, and check for asteroid collisions on our ship with an observer!
 
 Tips:
 
-- Remove the existing `collision` system, and replace it with an observer on the ship entity
+- Remove the existing `collision` system from the `Update` schedule
+- Add the `CollisionEventsEnabled` component to the ship entity
+- Change the previous `collision` system to be an observer that will trigger on `Trigger<OnCollisionStart>`
 
 ## Can Destroy Asteroids
 
-TODO
+To destroy asteroid, we need to be able to fire lasers!
 
 Tips:
 
-- new action to fire lasers
-- new sprite for lasers
-- despawn lasers after a certain time
-- collisions between asteroids and lasers
-- explodes asteroids
+- New action to fire lasers
+- New sprite for lasers
+- Spawn a laser when the action is fired
+  - With a `Sprite`
+  - With a `RigidBody`
+  - With a `Collider`
+  - With a `LinearVelocity`
+  - With `CollisionEventsEnabled`
+- Despawn lasers after a certain time
+- Observe collisions between asteroids and lasers
+- Despawn asteroid and laser when they collide
 
 ## Detect when all Asteroids are Destroyed
 
@@ -34,4 +42,7 @@ Switch to a win screen when all asteroids are destroyed
 
 Tips:
 
-- System with a query on all asteroids
+- Add a new state `GameState::Won`
+- Copy the menu and change the text and all the states used
+- Add a system with a query on asteroids
+- When there are no asteroids anymore, change state

@@ -183,7 +183,7 @@ We need to react when thrust is fired, adding linear velocity to the ship, and o
 # struct Thrust;
 fn thrust(
     trigger: Trigger<Fired<Thrust>>,
-    mut player: Query<(&Transform, &mut LinearVelocity, &Children), With<Player>>,
+    mut player: Query<(&Transform, &mut LinearVelocity, &Children)>,
     mut visibility: Query<&mut Visibility>,
 ) -> Result {
     let (transform, mut linear_velocity, children) = player.get_mut(trigger.target())?;
@@ -197,7 +197,7 @@ fn thrust(
 
 fn thrust_stop(
     trigger: Trigger<Completed<Thrust>>,
-    player: Query<&Children, With<Player>>,
+    player: Query<&Children>,
     mut visibility: Query<&mut Visibility>,
 ) -> Result {
     let children = player.get(trigger.target())?;
