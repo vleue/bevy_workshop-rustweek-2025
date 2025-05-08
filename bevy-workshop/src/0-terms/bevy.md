@@ -2,7 +2,7 @@
 
 ## Application
 
-The Application is the main entry point of Bevy. It manages the game loop, schedules systems, and handles resources and events. It exists only at build time.
+The Application is the main entry point of Bevy. It manages the game loop, schedules systems, and handles resources and events. It exists only during setup, and is not available once the game loop started.
 
 ## Plugin
 

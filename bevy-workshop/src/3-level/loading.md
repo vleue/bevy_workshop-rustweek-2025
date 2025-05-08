@@ -4,9 +4,9 @@
 
 We'll load the level information from a basic text file. The information we want from it are:
 
-- width and height of the level
-- number of asteroids to spawn
-- number of lives of the player
+- Width and height of the level
+- Number of asteroids to spawn
+- Number of lives of the player
 
 ## Asset Type
 

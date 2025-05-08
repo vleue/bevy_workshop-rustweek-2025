@@ -6,13 +6,13 @@ We'll add a new plugin to handle the start menu. It will be very similar to the 
 
 Tips:
 
-- create a new file for the new plugin, you can copy `splash.rs` as a starting point
-- change the state conditions and state scopes to `GameState::StartMenu`
-- modify the text to display a start menu instead of a splash screen
-- create a new variant of `GameState` for the game
-- modify the condition to change state to check for a key press instead of a timer
+- Create a new file for the new plugin, you can copy `splash.rs` as a starting point
+- Change the state conditions and state scopes to `GameState::StartMenu`
+- Modify the text to display a start menu instead of a splash screen
+- Create a new variant of `GameState` for the game
+- Modify the condition to change state to check for a key press instead of a timer
 
-  - the system parameter for key press is [`Res<ButtonInput<KeyCode>>`](https://docs.rs/bevy/latest/bevy/input/struct.ButtonInput.html)
-  - checking that a key was just pressed can be done with `input.just_pressed(KeyCode::Space)`
+  - The system parameter for key press is [`Res<ButtonInput<KeyCode>>`](https://docs.rs/bevy/latest/bevy/input/struct.ButtonInput.html)
+  - Checking that a key was just pressed can be done with `input.just_pressed(KeyCode::Space)`
 
-- add the new plugin to the application
+- Add the new plugin to the application

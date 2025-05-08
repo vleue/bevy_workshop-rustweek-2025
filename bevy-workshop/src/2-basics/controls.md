@@ -44,5 +44,7 @@ TODO
 ## Error handling in systems
 
 TODO
+
 new in 0.16 :tada:
+
 https://bevyengine.org/news/bevy-0-16/#unified-ecs-error-handling

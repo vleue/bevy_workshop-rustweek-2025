@@ -16,11 +16,6 @@ struct GameDuration(Stopwatch);
 fn display_hud(mut commands: Commands) {
     commands.spawn((
         Text::default(),
-        // TextFont {
-        //     font_size: 20.0,
-        //     ..default()
-        // },
-        // TextColor::from(palettes::tailwind::RED_600),
         StateScoped(GameState::Game),
         children![
             TextSpan::new("Asteroids remaining: "),
