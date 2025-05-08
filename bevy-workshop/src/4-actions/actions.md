@@ -95,8 +95,6 @@ For this action to be triggered, we need to add an a `Actions` component to our 
 # struct GameAssets;
 # #[derive(InputContext)]
 # struct ShipController;
-# #[derive(InputContext)]
-# struct ShipController;
 fn spawn_player(commands: &mut Commands, game_assets: &GameAssets) {
     let mut actions = Actions::<ShipController>::default();
 
@@ -243,6 +241,8 @@ And we're ready to define when this action will be executed, and to add the obse
 # fn thrust(trigger: Trigger<Fired<Thrust>>) -> Result {Ok(())}
 # fn thrust_stop(trigger: Trigger<Completed<Thrust>>) -> Result {Ok(())}
 # struct GameAssets;
+# #[derive(InputContext)]
+# struct ShipController;
 fn spawn_player(commands: &mut Commands, game_assets: &GameAssets) {
     let mut actions = Actions::<ShipController>::default();
 
