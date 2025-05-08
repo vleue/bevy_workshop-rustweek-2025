@@ -211,28 +211,28 @@ struct FireLaser;
 //     }
 // }
 
-fn collision(
-    collisions: Collisions,
-    player: Query<(&Transform, Entity), With<Player>>,
-    mut commands: Commands,
-    game_assets: Res<GameAssets>,
-) -> Result {
-    let Ok((transform, entity)) = player.single() else {
-        return Ok(());
-    };
+// fn collision(
+//     collisions: Collisions,
+//     player: Query<(&Transform, Entity), With<Player>>,
+//     mut commands: Commands,
+//     game_assets: Res<GameAssets>,
+// ) -> Result {
+//     let Ok((transform, entity)) = player.single() else {
+//         return Ok(());
+//     };
 
-    if collisions.collisions_with(entity).next().is_some() {
-        commands.spawn((
-            Sprite::from_image(game_assets.explosion.clone()),
-            (*transform).with_scale(Vec3::splat(0.2)),
-            Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
-            StateScoped(GameState::Game),
-        ));
-        commands.entity(entity).despawn();
-    }
+//     if collisions.collisions_with(entity).next().is_some() {
+//         commands.spawn((
+//             Sprite::from_image(game_assets.explosion.clone()),
+//             (*transform).with_scale(Vec3::splat(0.2)),
+//             Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
+//             StateScoped(GameState::Game),
+//         ));
+//         commands.entity(entity).despawn();
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 // fn collision(
 //     asteroids: Query<&Transform, With<Asteroid>>,
@@ -389,7 +389,7 @@ fn fire_laser(
         commands
             .spawn((
                 Sprite::from_color(Color::linear_rgb(1.0, 0.0, 0.0), Vec2::new(2.0, 15.0)),
-                transform.clone(),
+                *transform,
                 RigidBody::Dynamic,
                 Collider::rectangle(2.0, 15.0),
                 LinearVelocity(transform.local_y().xy() * 1000.0),
