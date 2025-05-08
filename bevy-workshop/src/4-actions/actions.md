@@ -39,6 +39,16 @@ First step to start using input mapping is to enable an input context. This is u
 # extern crate bevy_enhanced_input;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
+# fn display_level() {}
+# fn collision() {}
+# fn tick_explosion() {}
+# #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
+# enum GameState {
+#     #[default]
+#     Splash,
+#     StartMenu,
+#     Game,
+# }
 #[derive(InputContext)]
 struct ShipController;
 
@@ -83,6 +93,10 @@ For this action to be triggered, we need to add an a `Actions` component to our 
 # #[input_action(output = f32)]
 # struct Rotate;
 # struct GameAssets;
+# #[derive(InputContext)]
+# struct ShipController;
+# #[derive(InputContext)]
+# struct ShipController;
 fn spawn_player(commands: &mut Commands, game_assets: &GameAssets) {
     let mut actions = Actions::<ShipController>::default();
 
@@ -107,7 +121,7 @@ To react to the input action, we use a system that takes a [`Trigger`](https://d
 # extern crate bevy;
 # extern crate avian2d;
 # extern crate bevy_enhanced_input;
-# use avian2d::{PhysicsPlugins, prelude::Gravity};
+# use avian2d::prelude::*;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
 # #[derive(Debug, InputAction)]
@@ -136,7 +150,7 @@ We will attach this observer to our ship entity:
 # extern crate bevy;
 # extern crate avian2d;
 # extern crate bevy_enhanced_input;
-# use avian2d::{PhysicsPlugins, prelude::Gravity};
+# use avian2d::prelude::*;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
 # #[derive(Debug, InputAction)]
@@ -161,7 +175,7 @@ We need another action for thrust, this time its output should be just a boolean
 # extern crate bevy;
 # extern crate avian2d;
 # extern crate bevy_enhanced_input;
-# use avian2d::{PhysicsPlugins, prelude::Gravity};
+# use avian2d::prelude::*;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
 #[derive(Debug, InputAction)]
@@ -175,7 +189,7 @@ We need to react when thrust is fired, adding linear velocity to the ship, and o
 # extern crate bevy;
 # extern crate avian2d;
 # extern crate bevy_enhanced_input;
-# use avian2d::{PhysicsPlugins, prelude::Gravity};
+# use avian2d::prelude::*;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
 # #[derive(Debug, InputAction)]
@@ -216,9 +230,12 @@ And we're ready to define when this action will be executed, and to add the obse
 # extern crate bevy;
 # extern crate avian2d;
 # extern crate bevy_enhanced_input;
-# use avian2d::{PhysicsPlugins, prelude::Gravity};
+# use avian2d::prelude::*;
 # use bevy::prelude::*;
 # use bevy_enhanced_input::prelude::*;
+# #[derive(Debug, InputAction)]
+# #[input_action(output = f32)]
+# struct Rotate;
 # #[derive(Debug, InputAction)]
 # #[input_action(output = bool)]
 # struct Thrust;
