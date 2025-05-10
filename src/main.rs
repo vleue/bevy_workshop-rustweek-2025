@@ -8,6 +8,7 @@ mod hud;
 mod level;
 mod splash;
 mod start_menu;
+mod won;
 
 fn main() {
     App::new()
@@ -29,6 +30,7 @@ fn main() {
             game::game_plugin,
             level::level_loader_plugin,
             hud::hud_plugin,
+            won::won_plugin,
         ))
         .run();
 }
@@ -39,6 +41,7 @@ enum GameState {
     Splash,
     StartMenu,
     Game,
+    Won,
 }
 
 #[derive(Resource)]

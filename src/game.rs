@@ -21,6 +21,9 @@ pub fn game_plugin(app: &mut App) {
                 // collision,
                 laser_range,
                 tick_explosion,
+                has_won,
+                follow_player,
+                closest,
             )
                 .run_if(in_state(GameState::Game)),
         );
@@ -383,13 +386,14 @@ fn fire_laser(
     time: Res<Time>,
     mut last_fired: Local<Duration>,
 ) -> Result {
-    let transform = player.get(trigger.target())?;
+    let mut transform = player.get(trigger.target())?.clone();
+    transform.translation += transform.local_y() * 40.0;
 
     if time.elapsed() > *last_fired + Duration::from_secs_f32(0.5) {
         commands
             .spawn((
                 Sprite::from_color(Color::linear_rgb(1.0, 0.0, 0.0), Vec2::new(2.0, 15.0)),
-                *transform,
+                transform,
                 RigidBody::Dynamic,
                 Collider::rectangle(2.0, 15.0),
                 LinearVelocity(transform.local_y().xy() * 1000.0),
@@ -440,4 +444,61 @@ fn asteroid_collision(
         commands.entity(collision.target()).despawn();
     }
     Ok(())
+}
+
+fn has_won(asteroids: Query<(), With<Asteroid>>, mut next_state: ResMut<NextState<GameState>>) {
+    if asteroids.is_empty() {
+        next_state.set(GameState::Won);
+    }
+}
+
+fn follow_player(
+    player: Query<&Transform, With<Player>>,
+    mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
+) {
+    let Ok(player_transform) = player.single() else {
+        return;
+    };
+    let Ok(mut camera_transform) = camera.single_mut() else {
+        return;
+    };
+    camera_transform.translation = player_transform.translation;
+}
+
+fn closest(
+    asteroids: Query<(Entity, &Transform), With<Asteroid>>,
+    player: Query<&Transform, With<Player>>,
+    mut gizmos: Gizmos,
+    mut commands: Commands,
+) {
+    let Ok(player_transform) = player.single() else {
+        return;
+    };
+    let player_position = player_transform.translation.xy();
+    let Some((entity, nearest)) = asteroids.iter().reduce(|a, b| {
+        if a.1.translation.xy().distance_squared(player_position)
+            < b.1.translation.xy().distance_squared(player_position)
+        {
+            a
+        } else {
+            b
+        }
+    }) else {
+        return;
+    };
+    let nearest_position = nearest.translation.xy();
+    let distance = nearest_position - player_position;
+
+    let direction = distance.normalize();
+    if distance.length() > 1000.0 {
+        commands
+            .entity(entity)
+            .insert(LinearVelocity(direction.normalize() * -100.0));
+    }
+    gizmos.arrow_2d(
+        player_position + direction * 45.0,
+        player_position + direction * 70.0,
+        // nearest_position,
+        Color::hsl(0.0, 1.0, 0.5),
+    );
 }

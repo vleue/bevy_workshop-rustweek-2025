@@ -2,7 +2,7 @@
 
 ## What You've Learned
 
-- How Z-Index works in 2d: higher values are in front
+- TODO
 - How to implement reactivity
   - By using [`Trigger`](https://docs.rs/bevy/0.16.0/bevy/ecs/observer/struct.Trigger.html) and observers
   - Or with optional components to change how an existing query behaves
