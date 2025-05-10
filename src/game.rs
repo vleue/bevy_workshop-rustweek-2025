@@ -385,17 +385,19 @@ fn fire_laser(
     mut commands: Commands,
     time: Res<Time>,
     mut last_fired: Local<Duration>,
+    game_assets: Res<GameAssets>,
 ) -> Result {
-    let mut transform = player.get(trigger.target())?.clone();
+    let mut transform = *player.get(trigger.target())?;
     transform.translation += transform.local_y() * 40.0;
+    transform.scale = Vec3::ONE / 2.0;
 
     if time.elapsed() > *last_fired + Duration::from_secs_f32(0.5) {
         commands
             .spawn((
-                Sprite::from_color(Color::linear_rgb(1.0, 0.0, 0.0), Vec2::new(2.0, 15.0)),
+                Sprite::from_image(game_assets.laser.clone()),
                 transform,
                 RigidBody::Dynamic,
-                Collider::rectangle(2.0, 15.0),
+                Collider::rectangle(4.0, 15.0),
                 LinearVelocity(transform.local_y().xy() * 1000.0),
                 Laser(Timer::from_seconds(1.0, TimerMode::Once)),
                 CollisionEventsEnabled,

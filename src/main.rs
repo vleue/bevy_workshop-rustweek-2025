@@ -50,6 +50,7 @@ struct GameAssets {
     asteroid: Handle<Image>,
     jets: Handle<Image>,
     explosion: Handle<Image>,
+    laser: Handle<Image>,
 }
 
 #[derive(Resource)]
