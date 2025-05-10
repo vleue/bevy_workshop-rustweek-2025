@@ -27,18 +27,8 @@ First we'll add a dependency on `avian2d` to our `Cargo.toml` file:
 
 ```toml
 [dependencies]
-avian2d = "0.3.0"
+avian2d = "0.3"
 ```
-
-<div class="warning">
-
-At the time of writing, Avian has not yet been released for Bevy 0.16, but it has been updated in git.
-
-```toml
-avian2d = { git = "https://github.com/Jondolf/avian" }
-```
-
-</div>
 
 To finish the setup, we need to add the `PhysicsPlugins::default()` to our app. And as we're in space, let's remove gravity! This can be done by adding the resource `Gravity::ZERO`.
 
