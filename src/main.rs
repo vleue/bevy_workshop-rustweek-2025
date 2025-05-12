@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 mod splash;
+mod start_menu;
 
 fn main() {
     App::new()
@@ -13,7 +14,7 @@ fn main() {
         }))
         .init_state::<GameState>()
         .enable_state_scoped_entities::<GameState>()
-        .add_plugins(splash::splash_plugin)
+        .add_plugins((splash::splash_plugin, start_menu::menu_plugin))
         .run();
 }
 
