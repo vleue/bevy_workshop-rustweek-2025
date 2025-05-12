@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+mod game;
 mod splash;
 mod start_menu;
 
@@ -14,7 +15,11 @@ fn main() {
         }))
         .init_state::<GameState>()
         .enable_state_scoped_entities::<GameState>()
-        .add_plugins((splash::splash_plugin, start_menu::menu_plugin))
+        .add_plugins((
+            splash::splash_plugin,
+            start_menu::menu_plugin,
+            game::game_plugin,
+        ))
         .run();
 }
 
@@ -23,4 +28,10 @@ enum GameState {
     #[default]
     Splash,
     StartMenu,
+    Game,
+}
+
+#[derive(Resource)]
+struct GameAssets {
+    player_ship: Handle<Image>,
 }

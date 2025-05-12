@@ -39,8 +39,8 @@ fn display_title(mut commands: Commands) {
     ));
 }
 
-fn start_game(keyboard: Res<ButtonInput<KeyCode>>) {
+fn start_game(keyboard: Res<ButtonInput<KeyCode>>, mut next: ResMut<NextState<GameState>>) {
     if keyboard.get_just_pressed().next().is_some() {
-        println!("starting the game!")
+        next.set(GameState::Game);
     }
 }
