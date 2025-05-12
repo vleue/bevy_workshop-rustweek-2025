@@ -115,7 +115,7 @@ mod splash {
     # fn load_assets() {}
     # fn switch_to_menu() {}
     pub fn splash_plugin(app: &mut App) {
-        app.add_systems(OnEnter(GameState::Splash), (display_title, load_assets))
+        app.add_systems(OnEnter(GameState::Splash), display_title)
             .add_systems(Update, switch_to_menu.run_if(in_state(GameState::Splash)));
     }
 }
