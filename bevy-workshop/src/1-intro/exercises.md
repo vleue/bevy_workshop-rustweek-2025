@@ -1,5 +1,13 @@
 # Exercises
 
+Don't forget to checkout the branch:
+
+```sh
+git checkout 05-intro-to-bevy
+```
+
+Let's review what was changed: <https://github.com/vleue/bevy_workshop-rustweek-2025/compare/0-zero..05-intro-to-bevy>
+
 ## Adding a Start Menu
 
 We'll add a new plugin to handle the start menu. It will be very similar to the splash screen plugin, with different text and with a different condition to change state.
@@ -13,6 +21,6 @@ Tips:
 - Modify the condition to change state to check for a key press instead of a timer
 
   - The system parameter for key press is [`Res<ButtonInput<KeyCode>>`](https://docs.rs/bevy/latest/bevy/input/struct.ButtonInput.html)
-  - Checking that a key was just pressed can be done with `input.just_pressed(KeyCode::Space)`
+  - Checking that any key was just pressed can be done with `keyboard.get_just_pressed().next().is_some()`
 
 - Add the new plugin to the application
