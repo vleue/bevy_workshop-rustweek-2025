@@ -1,4 +1,4 @@
-use std::f32::consts::TAU;
+use std::{f32::consts::TAU, time::Duration};
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
@@ -12,7 +12,7 @@ pub fn game_plugin(app: &mut App) {
         .add_systems(OnEnter(GameState::Game), display_level)
         .add_systems(
             Update,
-            (collision, tick_explosion).run_if(in_state(GameState::Game)),
+            (tick_explosion, laser_range, has_won).run_if(in_state(GameState::Game)),
         );
 }
 
@@ -69,29 +69,6 @@ fn display_level(
     }
 }
 
-fn collision(
-    collisions: Collisions,
-    player: Query<(&Transform, Entity), With<Player>>,
-    mut commands: Commands,
-    game_assets: Res<GameAssets>,
-) -> Result {
-    let Ok((transform, entity)) = player.single() else {
-        return Ok(());
-    };
-
-    if collisions.collisions_with(entity).next().is_some() {
-        commands.spawn((
-            Sprite::from_image(game_assets.explosion.clone()),
-            (*transform).with_scale(Vec3::splat(0.2)),
-            Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
-            StateScoped(GameState::Game),
-        ));
-        commands.entity(entity).despawn();
-    }
-
-    Ok(())
-}
-
 fn tick_explosion(
     mut commands: Commands,
     mut explosions: Query<(Entity, &mut Explosion, &Transform)>,
@@ -125,6 +102,7 @@ fn spawn_player(commands: &mut Commands, game_assets: &GameAssets, position: Vec
         negative: KeyCode::KeyD,
     });
     actions.bind::<Thrust>().to(KeyCode::KeyW);
+    actions.bind::<FireLaser>().to(KeyCode::Space);
 
     commands
         .spawn((
@@ -145,7 +123,9 @@ fn spawn_player(commands: &mut Commands, game_assets: &GameAssets, position: Vec
         ))
         .observe(rotate)
         .observe(thrust)
-        .observe(thrust_stop);
+        .observe(thrust_stop)
+        .observe(fire_laser)
+        .observe(asteroid_collision);
 }
 
 #[derive(InputContext)]
@@ -158,6 +138,10 @@ struct Rotate;
 #[derive(Debug, InputAction)]
 #[input_action(output = bool)]
 struct Thrust;
+
+#[derive(Debug, InputAction)]
+#[input_action(output = bool)]
+struct FireLaser;
 
 fn rotate(
     trigger: Trigger<Fired<Rotate>>,
@@ -192,11 +176,92 @@ fn thrust_stop(
     player: Query<&Children>,
     mut visibility: Query<&mut Visibility>,
 ) -> Result {
-    let children = player.get(trigger.target())?;
+    let Ok(children) = player.get(trigger.target()) else {
+        return Ok(());
+    };
 
     visibility
         .get_mut(children[0])?
         .set_if_neq(Visibility::Hidden);
 
     Ok(())
+}
+
+fn asteroid_collision(
+    collision: Trigger<OnCollisionStart>,
+    is_asteroid: Query<(), With<Asteroid>>,
+    player: Query<&Transform>,
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+) -> Result {
+    if is_asteroid.get(collision.collider).is_ok() {
+        let transform = player.get(collision.target())?;
+        commands.spawn((
+            Sprite::from_image(game_assets.explosion.clone()),
+            (*transform).with_scale(Vec3::splat(0.2)),
+            Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
+            StateScoped(GameState::Game),
+        ));
+        commands.entity(collision.target()).despawn();
+        commands.entity(collision.collider).despawn();
+    }
+    Ok(())
+}
+
+#[derive(Component)]
+struct Laser(Timer);
+
+fn fire_laser(
+    trigger: Trigger<Fired<FireLaser>>,
+    player: Query<&Transform>,
+    mut commands: Commands,
+    time: Res<Time>,
+    mut last_fired: Local<Duration>,
+    game_assets: Res<GameAssets>,
+) -> Result {
+    let mut transform = *player.get(trigger.target())?;
+    transform.translation += transform.local_y() * 40.0;
+    transform.scale = Vec3::ONE / 2.0;
+
+    if time.elapsed() > *last_fired + Duration::from_secs_f32(0.5) {
+        commands
+            .spawn((
+                Sprite::from_image(game_assets.laser.clone()),
+                transform,
+                RigidBody::Dynamic,
+                Collider::rectangle(4.0, 15.0),
+                LinearVelocity(transform.local_y().xy() * 1000.0),
+                Laser(Timer::from_seconds(1.0, TimerMode::Once)),
+                CollisionEventsEnabled,
+                StateScoped(GameState::Game),
+            ))
+            .observe(laser_attack);
+        *last_fired = time.elapsed();
+    }
+    Ok(())
+}
+
+fn laser_range(mut commands: Commands, mut lasers: Query<(Entity, &mut Laser)>, time: Res<Time>) {
+    for (entity, mut laser) in &mut lasers {
+        if laser.0.tick(time.delta()).just_finished() {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
+fn laser_attack(
+    collision: Trigger<OnCollisionStart>,
+    is_asteroid: Query<(), With<Asteroid>>,
+    mut commands: Commands,
+) {
+    if is_asteroid.get(collision.collider).is_ok() {
+        commands.entity(collision.collider).despawn();
+        commands.entity(collision.target()).despawn();
+    }
+}
+
+fn has_won(asteroids: Query<(), With<Asteroid>>, mut next_state: ResMut<NextState<GameState>>) {
+    if asteroids.is_empty() {
+        next_state.set(GameState::Won);
+    }
 }
