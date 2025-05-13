@@ -1,4 +1,7 @@
+use std::f32::consts::TAU;
+
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::{GameAssets, GameState};
 
@@ -6,7 +9,7 @@ pub fn game_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Game), display_level)
         .add_systems(
             Update,
-            (control_player, collision).run_if(in_state(GameState::Game)),
+            (control_player, collision, inertia, tick_explosion).run_if(in_state(GameState::Game)),
         );
 }
 
@@ -14,7 +17,13 @@ pub fn game_plugin(app: &mut App) {
 struct Player;
 
 #[derive(Component)]
-struct Asteroid;
+struct Asteroid {
+    direction: Vec2,
+    speed: f32,
+}
+
+#[derive(Component)]
+struct Explosion(Timer);
 
 fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
     commands.spawn((
@@ -28,11 +37,16 @@ fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
         ),],
     ));
 
+    let mut rng = rand::thread_rng();
+
     for (x, y) in [(1., 1.), (-1., 1.), (-1., -1.), (1., -1.)] {
         commands.spawn((
             Sprite::from_image(game_assets.asteroid.clone()),
             Transform::from_xyz(300.0 * x, 200.0 * y, 0.0),
-            Asteroid,
+            Asteroid {
+                direction: Vec2::from_angle(rng.gen_range(0.0..TAU)),
+                speed: rng.gen_range(0.5..2.0),
+            },
             StateScoped(GameState::Game),
         ));
     }
@@ -44,7 +58,9 @@ fn control_player(
     time: Res<Time>,
     mut visibility: Query<&mut Visibility>,
 ) -> Result {
-    let (mut player_transform, children) = player.single_mut()?;
+    let Ok((mut player_transform, children)) = player.single_mut() else {
+        return Ok(());
+    };
 
     let fixed_rotation_rate = 0.2;
     let rotation_rate = fixed_rotation_rate / (1.0 / (60.0 * time.delta().as_secs_f32()));
@@ -72,12 +88,16 @@ fn control_player(
 
 fn collision(
     asteroids: Query<&Transform, With<Asteroid>>,
-    player: Query<&Transform, With<Player>>,
+    player: Query<(&Transform, Entity), With<Player>>,
     mut gizmos: Gizmos,
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
 ) -> Result {
     let player_radius = 40.0;
     let asteroid_radius = 50.0;
-    let player_transform = player.single()?;
+    let Ok((player_transform, player_entity)) = player.single() else {
+        return Ok(());
+    };
     gizmos.circle_2d(
         player_transform.translation.xy(),
         player_radius,
@@ -93,9 +113,33 @@ fn collision(
             .translation
             .distance(player_transform.translation);
         if distance < (asteroid_radius + player_radius) {
-            println!("Collision detected!");
+            commands.spawn((
+                Sprite::from_image(game_assets.explosion.clone()),
+                player_transform.clone().with_scale(Vec3::splat(0.2)),
+                Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
+                StateScoped(GameState::Game),
+            ));
+            commands.entity(player_entity).despawn();
         }
     }
 
     Ok(())
+}
+
+fn inertia(mut asteroids: Query<(&mut Transform, &Asteroid)>) {
+    for (mut asteroid_transform, asteroid) in asteroids.iter_mut() {
+        asteroid_transform.translation += (asteroid.direction * asteroid.speed).extend(0.0);
+    }
+}
+
+fn tick_explosion(
+    mut explosions: Query<&mut Explosion>,
+    time: Res<Time>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for mut timer in explosions.iter_mut() {
+        if timer.0.tick(time.delta()).just_finished() {
+            next_state.set(GameState::StartMenu);
+        }
+    }
 }

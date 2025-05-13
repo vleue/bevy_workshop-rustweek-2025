@@ -36,4 +36,5 @@ struct GameAssets {
     player_ship: Handle<Image>,
     asteroid: Handle<Image>,
     jets: Handle<Image>,
+    explosion: Handle<Image>,
 }

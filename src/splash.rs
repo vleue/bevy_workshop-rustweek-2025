@@ -59,5 +59,6 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
         player_ship: asset_server.load("playerShip1_green.png"),
         asteroid: asset_server.load("meteorBrown_big1.png"),
         jets: asset_server.load("fire07.png"),
+        explosion: asset_server.load("explosion00.png"),
     });
 }
