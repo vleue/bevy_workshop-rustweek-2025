@@ -71,7 +71,7 @@ fn fire_laser(
 
 To receive an event, we must use the [`EventReader`](https://docs.rs/bevy/0.16.0/bevy/ecs/event/struct.EventReader.html) system parameter, and by calling [`EventReader::read`](https://docs.rs/bevy/0.16.0/bevy/ecs/event/struct.EventReader.html#method.read) we can iterate over events.
 
-To play audio, we must spawn an entity with the [`AudioStart`](https://docs.rs/bevy/0.16.0/bevy/audio/struct.AudioStart.html) component that will contain an [`Handle`](https://docs.rs/bevy/0.16.0/bevy/asset/enum.Handle.html) to the [`AudioSource`](https://docs.rs/bevy/0.16.0/bevy/audio/struct.AudioSource.html) asset.
+To play audio, we must spawn an entity with the [`AudioPlayer`](https://docs.rs/bevy/0.16.0/bevy/audio/struct.AudioPlayer.html) component that will contain an [`Handle`](https://docs.rs/bevy/0.16.0/bevy/asset/enum.Handle.html) to the [`AudioSource`](https://docs.rs/bevy/0.16.0/bevy/audio/struct.AudioSource.html) asset.
 
 By default, audio entities remain present once the audio is done playing. You can change this behaviour with the component [`PlaybackSettings::DESPAWN`](https://docs.rs/bevy/0.16.0/bevy/audio/struct.PlaybackSettings.html#associatedconstant.DESPAWN).
 

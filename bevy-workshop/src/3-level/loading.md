@@ -26,6 +26,12 @@ pub struct Level {
 
 ## Asset Loader
 
+Let's add `thiserror` as a dependency, this will help us when declaring the kind of errors that can happen when loading our file.
+
+```sh
+cargo add thiserror
+```
+
 To load this format, we'll read the file character by character, then choose the right tile depending on the character. Bevy expects custom asset loader to implement the trait [`AssetLoader`](https://docs.rs/bevy/0.16.0/bevy/asset/trait.AssetLoader.html).
 
 ```rust
@@ -108,7 +114,7 @@ Custom asset formats and loaders must be initiated in the application with [`App
 #     async fn load(&self, reader: &mut dyn Reader, _settings: &(), _load_context: &mut LoadContext<'_>) -> Result<Self::Asset, Self::Error> { unimplemented!() }
 #     fn extensions(&self) -> &[&str] { &["bw"] }
 # }
-fn level_loader_plugin(app: &mut App) {
+pub fn level_loader_plugin(app: &mut App) {
     app.init_asset::<Level>().init_asset_loader::<LevelLoader>();
 }
 ```

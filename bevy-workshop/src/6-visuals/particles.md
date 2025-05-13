@@ -13,7 +13,7 @@ bevy_hanabi uses the GPU through compute shaders, while bevy_enoki does it all o
 
 Let's add the plugin to our project:
 
-```bash
+```sh
 cargo add bevy_enoki
 ```
 

@@ -2,6 +2,14 @@
 
 It's very easy to avoid collisions with the asteroids as they don't move... Let's make this game a bit harder!
 
+You can continue from your code, or get the branch with the workshop up till now:
+
+```sh
+git checkout 06-basic-game-mid
+```
+
+Let's review what was changed: <https://github.com/vleue/bevy_workshop-rustweek-2025/compare/06-basic-game..06-basic-game-mid>
+
 ## Moving the Asteroids
 
 Make the asteroids move in random directions, at random speeds.
@@ -9,6 +17,7 @@ Make the asteroids move in random directions, at random speeds.
 Tips:
 
 - Add information about direction and speed to the `Asteroid` component.
+- Add the rand crate (`cargo add rand@0.8`) to set them to random values with [`Rng::gen_range`](https://docs.rs/rand/0.8.5/rand/trait.Rng.html#method.gen_range)
 - Add a system to update the position of the asteroids based on their direction and speed.
 
 ## Losing the Game
@@ -17,7 +26,7 @@ Let's go back to the menu when colliding with an asteroid.
 
 Tips:
 
-- Use the `ResMut<NextState<GameStates>>` system parameter to change the current state on collision
+- Use the `ResMut<NextState<GameState>>` system parameter to change the current state on collision
 
 ## Explosion Effect on Collision
 

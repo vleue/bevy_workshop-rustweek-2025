@@ -62,7 +62,7 @@ fn collision(
             .translation
             .distance(player_transform.translation);
         if distance < (asteroid_radius + player_radius) {
-            info!("Collision detected!");
+            println!("Collision detected!");
         }
     }
 
@@ -112,7 +112,7 @@ fn collision(
             .translation
             .distance(player_transform.translation);
         if distance < (asteroid_radius + player_radius) {
-            info!("Collision detected!");
+            println!("Collision detected!");
         }
     }
 

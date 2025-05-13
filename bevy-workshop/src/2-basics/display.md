@@ -1,5 +1,7 @@
 # Displaying Something
 
+Let's start building a game! First step is to add a new `Game` variant to the `GameState` enum, and change to it in the menu instead of just printing something.
+
 We'll just display blocks of color for now, as placeholders. Red is the player, blue is an asteroid.
 
 ```rust,no_run
@@ -8,7 +10,7 @@ We'll just display blocks of color for now, as placeholders. Red is the player, 
 # enum GameState { #[default] Game }
 use bevy::prelude::*;
 
-fn game_plugin(app: &mut App) {
+pub fn game_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Game), display_level);
 }
 

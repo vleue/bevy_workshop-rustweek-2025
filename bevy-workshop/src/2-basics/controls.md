@@ -2,6 +2,8 @@
 
 We'll control our player with the `A` and `D` keys on the keyboard to turn, and `W` for thrust.
 
+Let's start by handling rotation:
+
 ```rust,no_run
 # extern crate bevy;
 # use bevy::prelude::*;
@@ -11,17 +13,18 @@ We'll control our player with the `A` and `D` keys on the keyboard to turn, and 
 fn control_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player: Query<&mut Transform, With<Player>>,
+    time: Res<Time>,
 ) -> Result {
     let mut player_transform = player.single_mut()?;
+
+    let fixed_rotation_rate = 0.2;
+    let rotation_rate = fixed_rotation_rate / (1.0 / (60.0 * time.delta().as_secs_f32()));
+
     if keyboard_input.pressed(KeyCode::KeyA) {
-        player_transform.rotate_z(FRAC_PI_8 / 4.0);
+        player_transform.rotate_z(rotation_rate);
     }
     if keyboard_input.pressed(KeyCode::KeyD) {
-        player_transform.rotate_z(-FRAC_PI_8 / 4.0);
-    }
-    if keyboard_input.pressed(KeyCode::KeyW) {
-        let forward = player_transform.local_y();
-        player_transform.translation += forward * 5.0;
+        player_transform.rotate_z(-rotation_rate);
     }
     Ok(())
 }
@@ -56,6 +59,10 @@ Bevy exposes helper methods to manipulate the `Transform`:
 - [`Transform::local_y()`](https://docs.rs/bevy/0.16.0/bevy/prelude/struct.Transform.html#method.local_y) to get a given direction according to an object
 
 As Bevy doesn't specialize for 2D, `Transform` has all the needed part for 3D and can be a bit hard to use in 2D.
+
+## Time Delta
+
+TODO
 
 ## Error handling in systems
 

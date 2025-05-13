@@ -23,18 +23,17 @@ Let's pick a physics engine that's easy to use with Bevy. There are two options:
 
 We'll use Avian in this workshop, but you could use Rapier and get similar results.
 
-First we'll add a dependency on `avian2d` to our `Cargo.toml` file:
+First we'll add a dependency on `avian2d` to our project:
 
 ```toml
-[dependencies]
-avian2d = "0.3"
+cargo add avian2d
 ```
 
 To finish the setup, we need to add the `PhysicsPlugins::default()` to our app. And as we're in space, let's remove gravity! This can be done by adding the resource `Gravity::ZERO`.
 
 ## Asteroid Movements
 
-Asteroids are the easiest to do! First remove the `inertia` system, as that will now be handled by the physics engine.
+Asteroids are the easiest to do! First remove the `inertia` system, and the fields of the `Asteroid` component, as that will now be handled by the physics engine.
 
 When spawning an asteroid, we'll need to add the following components:
 
@@ -152,7 +151,7 @@ fn control_player(
     >,
     mut visibility: Query<&mut Visibility>,
 ) -> Result {
-    let Ok((transform, mut angular_velocity, mut linear_velocity, children)) = player.single_mut()
+    let Ok((player_transform, mut angular_velocity, mut linear_velocity, children)) = player.single_mut()
     else {
         // No player at the moment, skip control logic
         return Ok(());
@@ -164,8 +163,9 @@ fn control_player(
         angular_velocity.0 -= 0.2;
     }
     if keyboard_input.pressed(KeyCode::KeyW) {
-        linear_velocity.0 += transform.local_y().xy() * 2.0;
-        linear_velocity.0 = linear_velocity.0.clamp_length_max(200.0);
+        let forward = player_transform.local_y();
+        linear_velocity.0 += forward.xy() * 2.0;
+        linear_velocity.0 = linear_velocity.0.clamp_length_max(300.0);
         *visibility.get_mut(children[0])? = Visibility::Visible;
     } else {
         visibility
