@@ -7,3 +7,4 @@ edition = "2024"
 avian2d = "0.3.0"
 bevy = { version = "0.16", default-features = false, features = ["bevy_asset", "bevy_audio", "bevy_core_pipeline", "bevy_render", "bevy_sprite", "bevy_state", "bevy_text", "bevy_ui", "bevy_winit", "default_font", "multi_threaded", "bevy_gizmos", "wav", "png", "x11", "wayland", "webgl2"] }
 rand = "0.8"
+thiserror = "2.0.12"

@@ -1279,6 +1279,7 @@ dependencies = [
  "avian2d",
  "bevy",
  "rand",
+ "thiserror 2.0.12",
 ]
 
 [[package]]

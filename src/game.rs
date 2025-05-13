@@ -4,7 +4,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{GameAssets, GameState};
+use crate::{GameAssets, GameState, LoadedLevel, level::Level};
 
 pub fn game_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Game), display_level)
@@ -23,7 +23,14 @@ struct Asteroid;
 #[derive(Component)]
 struct Explosion(Timer);
 
-fn display_level(mut commands: Commands, game_assets: Res<GameAssets>) {
+fn display_level(
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+    loaded_level: Res<LoadedLevel>,
+    levels: Res<Assets<Level>>,
+) {
+    let level = levels.get(&loaded_level.level).unwrap();
+
     commands.spawn((
         Sprite::from_image(game_assets.player_ship.clone()),
         RigidBody::Dynamic,
