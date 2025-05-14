@@ -11,51 +11,31 @@ use crate::{AudioAssets, GameAssets, GameState, LoadedLevel, audio::AudioStart, 
 pub fn game_plugin(app: &mut App) {
     app.add_input_context::<ShipController>()
         .add_systems(OnEnter(GameState::Game), display_level)
-        // .add_systems(
-        //     FixedUpdate,
-        //     // (control_player, move_player).run_if(in_state(GameState::Game)),
-        //     control_player.run_if(in_state(GameState::Game)),
-        // )
         .add_systems(
             Update,
-            (
-                // collision,
-                laser_range,
-                tick_explosion,
-                has_won,
-                follow_player,
-                closest,
-            )
+            (tick_explosion, laser_range, has_won, follow_player, closest)
                 .run_if(in_state(GameState::Game)),
         );
-    // .add_observer(rotate);
 }
 
 #[derive(Component)]
 struct Player;
 
-#[derive(Resource)]
-pub struct LivesRemaining(pub u32);
-
-// #[derive(Component)]
-// struct PlayerVelocity(Vec2);
-
 #[derive(Component)]
 pub struct Asteroid;
-// {
-//     direction: Vec2,
-//     speed: f32,
-// }
 
 #[derive(Component)]
 struct Explosion(Timer);
 
+#[derive(Resource)]
+pub struct LivesRemaining(pub u32);
+
 fn display_level(
     mut commands: Commands,
     game_assets: Res<GameAssets>,
-    audio_assets: Res<AudioAssets>,
     loaded_level: Res<LoadedLevel>,
     levels: Res<Assets<Level>>,
+    audio_assets: Res<AudioAssets>,
 ) {
     let level = levels.get(&loaded_level.level).unwrap();
 
@@ -67,23 +47,10 @@ fn display_level(
         StateScoped(GameState::Game),
     ));
 
-    // commands.spawn((
-    //     Sprite::from_image(game_assets.player_ship.clone()),
-    //     RigidBody::Dynamic,
-    //     Collider::circle(40.0),
-    //     AngularDamping(5.0),
-    //     Player,
-    //     // PlayerVelocity(Vec2::ZERO),
-    //     StateScoped(GameState::Game),
-    //     children![(
-    //         Sprite::from_image(game_assets.jets.clone()),
-    //         Transform::from_xyz(0.0, -40.0, -1.0),
-    //         Visibility::Hidden,
-    //     )],
-    // ));
     spawn_player(&mut commands, game_assets.as_ref(), Vec2::ZERO);
 
     let mut rng = rand::thread_rng();
+
     for (x, y) in std::iter::repeat(())
         .filter_map(|_| {
             let x = rng.gen_range(-(level.width as f32) / 2.0..(level.width as f32) / 2.0);
@@ -103,195 +70,21 @@ fn display_level(
             Transform::from_xyz(x, y, 0.0),
             RigidBody::Dynamic,
             Collider::circle(45.0),
-            LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(50.0..100.0)),
-            AngularVelocity(rng.gen_range(-2.0..2.0)),
-            // CollisionEventsEnabled,
-            // Asteroid {
-            //     direction: Vec2::from_angle(rng.gen_range(0.0..TAU)),
-            //     speed: rng.gen_range(0.5..2.0),
-            // },
+            LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0)),
+            AngularVelocity(rng.gen_range(-1.5..1.5)),
             Asteroid,
             StateScoped(GameState::Game),
         ));
     }
-    // let mut rng = rand::thread_rng();
-    // for (x, y) in [(1., 1.), (-1., 1.), (-1., -1.), (1., -1.)] {
-    //     commands.spawn((
-    //         Sprite::from_image(game_assets.asteroid.clone()),
-    //         Transform::from_xyz(300.0 * x, 200.0 * y, 0.0),
-    //         RigidBody::Dynamic,
-    //         Collider::circle(45.0),
-    //         LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0)),
-    //         AngularVelocity(rng.gen_range(-1.5..1.5)),
-    //         // Asteroid {
-    //         //     direction: Vec2::from_angle(rng.gen_range(0.0..TAU)),
-    //         //     speed: rng.gen_range(0.5..2.0),
-    //         // },
-    //         Asteroid,
-    //         StateScoped(GameState::Game),
-    //     ));
-    // }
 }
-
-// fn control_player(
-//     keyboard_input: Res<ButtonInput<KeyCode>>,
-//     mut player: Query<(&mut Transform, &mut PlayerVelocity, &Children), With<Player>>,
-//     mut visibility: Query<&mut Visibility>,
-// ) -> Result {
-//     let Ok((mut player_transform, mut player_velocity, children)) = player.single_mut() else {
-//         // No player at the moment, skip control logic
-//         return Ok(());
-//     };
-//     if keyboard_input.pressed(KeyCode::KeyA) {
-//         player_transform.rotate_z(FRAC_PI_8 / 4.0);
-//     }
-//     if keyboard_input.pressed(KeyCode::KeyD) {
-//         player_transform.rotate_z(-FRAC_PI_8 / 4.0);
-//     }
-//     if keyboard_input.pressed(KeyCode::KeyW) {
-//         let forward = player_transform.local_y().xy();
-//         player_velocity.0 = forward;
-//         *visibility.get_mut(children[0])? = Visibility::Visible;
-//     } else {
-//         visibility
-//             .get_mut(children[0])?
-//             .set_if_neq(Visibility::Hidden);
-//     }
-//     Ok(())
-// }
-// fn control_player(
-//     keyboard_input: Res<ButtonInput<KeyCode>>,
-//     mut player: Query<
-//         (
-//             &Transform,
-//             &mut AngularVelocity,
-//             &mut LinearVelocity,
-//             &Children,
-//         ),
-//         With<Player>,
-//     >,
-//     mut visibility: Query<&mut Visibility>,
-// ) -> Result {
-//     let Ok((transform, mut angular_velocity, mut linear_velocity, children)) = player.single_mut()
-//     else {
-//         // No player at the moment, skip control logic
-//         return Ok(());
-//     };
-//     if keyboard_input.pressed(KeyCode::KeyA) {
-//         angular_velocity.0 += 0.2;
-//     }
-//     if keyboard_input.pressed(KeyCode::KeyD) {
-//         angular_velocity.0 -= 0.2;
-//     }
-//     if keyboard_input.pressed(KeyCode::KeyW) {
-//         linear_velocity.0 += transform.local_y().xy() * 2.0;
-//         linear_velocity.0 = linear_velocity.0.clamp_length_max(200.0);
-//         *visibility.get_mut(children[0])? = Visibility::Visible;
-//     } else {
-//         visibility
-//             .get_mut(children[0])?
-//             .set_if_neq(Visibility::Hidden);
-//     }
-//     Ok(())
-// }
-
-#[derive(InputContext)]
-struct ShipController;
-
-#[derive(Debug, InputAction)]
-#[input_action(output = f32)]
-struct Rotate;
-
-#[derive(Debug, InputAction)]
-#[input_action(output = bool)]
-struct Thrust;
-
-#[derive(Debug, InputAction)]
-#[input_action(output = bool)]
-struct FireLaser;
-
-// fn move_player(mut player: Query<(&mut Transform, &PlayerVelocity)>) {
-//     for (mut player_transform, player_velocity) in player.iter_mut() {
-//         player_transform.translation += player_velocity.0.extend(0.0) * 5.0;
-//     }
-// }
-
-// fn inertia(mut asteroids: Query<(&mut Transform, &Asteroid)>) {
-//     for (mut asteroid_transform, asteroid) in asteroids.iter_mut() {
-//         asteroid_transform.translation += (asteroid.direction * asteroid.speed).extend(0.0);
-//     }
-// }
-
-// fn collision(
-//     collisions: Collisions,
-//     player: Query<(&Transform, Entity), With<Player>>,
-//     mut commands: Commands,
-//     game_assets: Res<GameAssets>,
-// ) -> Result {
-//     let Ok((transform, entity)) = player.single() else {
-//         return Ok(());
-//     };
-
-//     if collisions.collisions_with(entity).next().is_some() {
-//         commands.spawn((
-//             Sprite::from_image(game_assets.explosion.clone()),
-//             (*transform).with_scale(Vec3::splat(0.2)),
-//             Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
-//             StateScoped(GameState::Game),
-//         ));
-//         commands.entity(entity).despawn();
-//     }
-
-//     Ok(())
-// }
-
-// fn collision(
-//     asteroids: Query<&Transform, With<Asteroid>>,
-//     player: Query<(&Transform, Entity), With<Player>>,
-//     mut gizmos: Gizmos,
-//     mut commands: Commands,
-//     game_assets: Res<GameAssets>,
-// ) -> Result {
-//     let player_radius = 40.0;
-//     let asteroid_radius = 50.0;
-//     let Ok((player_transform, player_entity)) = player.single() else {
-//         return Ok(());
-//     };
-//     gizmos.circle_2d(
-//         player_transform.translation.xy(),
-//         player_radius,
-//         Color::linear_rgb(1.0, 0.0, 0.0),
-//     );
-//     for asteroid_transform in &asteroids {
-//         gizmos.circle_2d(
-//             asteroid_transform.translation.xy(),
-//             asteroid_radius,
-//             Color::linear_rgb(0.0, 0.0, 1.0),
-//         );
-//         let distance = asteroid_transform
-//             .translation
-//             .distance(player_transform.translation);
-//         if distance < (asteroid_radius + player_radius) {
-//             commands.spawn((
-//                 Sprite::from_image(game_assets.explosion.clone()),
-//                 player_transform.clone().with_scale(Vec3::splat(0.2)),
-//                 Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
-//                 StateScoped(GameState::Game),
-//             ));
-//             commands.entity(player_entity).despawn();
-//         }
-//     }
-
-//     Ok(())
-// }
 
 fn tick_explosion(
     mut commands: Commands,
-    game_assets: Res<GameAssets>,
-    mut lives_remaining: ResMut<LivesRemaining>,
     mut explosions: Query<(Entity, &mut Explosion, &Transform)>,
     time: Res<Time>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut lives_remaining: ResMut<LivesRemaining>,
+    game_assets: Res<GameAssets>,
     mut audio: EventWriter<AudioStart>,
 ) {
     for (entity, mut timer, transform) in explosions.iter_mut() {
@@ -330,17 +123,11 @@ fn spawn_player(commands: &mut Commands, game_assets: &GameAssets, position: Vec
             AngularDamping(5.0),
             Player,
             Transform::from_translation(position.extend(0.0)),
-            // PlayerVelocity(Vec2::ZERO),
             CollisionEventsEnabled,
             StateScoped(GameState::Game),
             children![
                 (
-                    // Sprite::from_image(game_assets.jets.clone()),
-                    Sprite {
-                        image: game_assets.jets.clone(),
-                        color: Color::srgb(2.0, 2.0, 1.0),
-                        ..default()
-                    },
+                    Sprite::from_image(game_assets.jets.clone()),
                     Transform::from_xyz(0.0, -40.0, -1.0),
                     Visibility::Hidden,
                 ),
@@ -359,9 +146,24 @@ fn spawn_player(commands: &mut Commands, game_assets: &GameAssets, position: Vec
         .observe(rotate)
         .observe(thrust)
         .observe(thrust_stop)
-        .observe(asteroid_collision)
-        .observe(fire_laser);
+        .observe(fire_laser)
+        .observe(asteroid_collision);
 }
+
+#[derive(InputContext)]
+struct ShipController;
+
+#[derive(Debug, InputAction)]
+#[input_action(output = f32)]
+struct Rotate;
+
+#[derive(Debug, InputAction)]
+#[input_action(output = bool)]
+struct Thrust;
+
+#[derive(Debug, InputAction)]
+#[input_action(output = bool)]
+struct FireLaser;
 
 fn rotate(
     trigger: Trigger<Fired<Rotate>>,
@@ -386,6 +188,7 @@ fn thrust(
     let (transform, mut linear_velocity, children) = player.get_mut(trigger.target())?;
     linear_velocity.0 += transform.local_y().xy() * 2.0;
     linear_velocity.0 = linear_velocity.0.clamp_length_max(300.0);
+
     visibility
         .get_mut(children[0])?
         .set_if_neq(Visibility::Visible);
@@ -394,7 +197,6 @@ fn thrust(
         .get_mut(children[1])?
         .map_unchanged(|s| &mut s.active)
         .set_if_neq(true);
-
     Ok(())
 }
 
@@ -420,6 +222,29 @@ fn thrust_stop(
     Ok(())
 }
 
+fn asteroid_collision(
+    collision: Trigger<OnCollisionStart>,
+    is_asteroid: Query<(), With<Asteroid>>,
+    player: Query<&Transform>,
+    mut commands: Commands,
+    game_assets: Res<GameAssets>,
+    mut audio: EventWriter<AudioStart>,
+) -> Result {
+    if is_asteroid.get(collision.collider).is_ok() {
+        let transform = player.get(collision.target())?;
+        commands.spawn((
+            Sprite::from_image(game_assets.explosion.clone()),
+            (*transform).with_scale(Vec3::splat(0.2)),
+            Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
+            StateScoped(GameState::Game),
+        ));
+        commands.entity(collision.target()).despawn();
+        commands.entity(collision.collider).despawn();
+        audio.write(AudioStart::ShipExplosion);
+    }
+    Ok(())
+}
+
 #[derive(Component)]
 struct Laser(Timer);
 
@@ -439,7 +264,6 @@ fn fire_laser(
     if time.elapsed() > *last_fired + Duration::from_secs_f32(0.5) {
         commands
             .spawn((
-                // Sprite::from_image(game_assets.laser.clone()),
                 Sprite {
                     image: game_assets.laser.clone(),
                     color: Color::srgb(5.0, 1.0, 1.0),
@@ -454,8 +278,9 @@ fn fire_laser(
                 StateScoped(GameState::Game),
             ))
             .observe(laser_attack);
-        *last_fired = time.elapsed();
         audio.write(AudioStart::Laser);
+
+        *last_fired = time.elapsed();
     }
     Ok(())
 }
@@ -479,29 +304,6 @@ fn laser_attack(
         commands.entity(collision.target()).despawn();
         audio.write(AudioStart::AsteroidExplosion);
     }
-}
-
-fn asteroid_collision(
-    collision: Trigger<OnCollisionStart>,
-    is_asteroid: Query<(), With<Asteroid>>,
-    player: Query<&Transform>,
-    mut commands: Commands,
-    game_assets: Res<GameAssets>,
-    mut audio: EventWriter<AudioStart>,
-) -> Result {
-    if is_asteroid.get(collision.collider).is_ok() {
-        let transform = player.get(collision.target())?;
-        commands.spawn((
-            Sprite::from_image(game_assets.explosion.clone()),
-            (*transform).with_scale(Vec3::splat(0.2)),
-            Explosion(Timer::from_seconds(1.0, TimerMode::Once)),
-            StateScoped(GameState::Game),
-        ));
-        commands.entity(collision.target()).despawn();
-        commands.entity(collision.collider).despawn();
-        audio.write(AudioStart::ShipExplosion);
-    }
-    Ok(())
 }
 
 fn has_won(

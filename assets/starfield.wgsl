@@ -49,10 +49,6 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
 
     let intensity = clamp(rand(in.uv * globals.time), 0.4, 1.0);
 
-//    result = result + vec3<f32>(stars(in.uv - coords / (move_factor * 1.2), 3.0, 0.025, 2.0)) * intensity;
-//    result = result + vec3<f32>(stars(in.uv - coords / (move_factor * 1.4), 10.0, 0.018, 1.0)) * intensity;
-//    result = result + vec3<f32>(stars(in.uv - coords / (move_factor * 2.0), 30.0, 0.015, 0.5)) * intensity;
-
     result = result + stars(in.uv + vec2<f32>(material.seeds.x, 0.0) - coords / (move_factor * 1.2), 3.0, 0.025, 2.0) * vec3<f32>(3.6, 3.6, 3.6) * intensity;
     result = result + stars(in.uv + vec2<f32>(material.seeds.y, 0.0) - coords / (move_factor * 1.4), 10.0, 0.018, 1.0) * vec3<f32>(6.7, 6.7, 6.7) * intensity;
     result = result + stars(in.uv + vec2<f32>(material.seeds.x, material.seeds.y) - coords / (move_factor * 2.0), 30.0, 0.015, 0.5) * vec3<f32>(.75, .75, .75) * intensity;
