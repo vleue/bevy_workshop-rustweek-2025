@@ -33,6 +33,21 @@ For this workshop, we'll use the following features:
 cargo add bevy@0.16 --no-default-features --features "bevy_asset,bevy_audio,bevy_core_pipeline,bevy_render,bevy_sprite,bevy_state,bevy_text,bevy_ui,bevy_winit,default_font,multi_threaded,bevy_gizmos,wav,png,x11,wayland,webgl2"
 ```
 
+<div class="warning">
+
+You can add all the dependencies used in this workshop now to avoid recompilations later:
+
+```sh
+cargo add bevy@0.16 --no-default-features --features "bevy_asset,bevy_audio,bevy_core_pipeline,bevy_render,bevy_sprite,bevy_state,bevy_text,bevy_ui,bevy_winit,default_font,multi_threaded,bevy_gizmos,wav,png,x11,wayland,webgl2"
+cargo add avian2d
+cargo add bevy_enhanced_input
+cargo add bevy_enoki
+cargo add rand@0.8
+cargo add thiserror
+```
+
+</div>
+
 This is the most basic Bevy application. It will exit immediately upon running and perform no actions.
 
 ```rust
