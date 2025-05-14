@@ -8,8 +8,8 @@ We'll create a new resource to hold the handles to audio assets, and load it in 
 # extern crate bevy;
 # use bevy::prelude::*;
 #[derive(Resource)]
-struct AudioAssets {
-    laser: Handle<AudioSource>,
+pub struct AudioAssets {
+    pub laser: Handle<AudioSource>,
 }
 
 fn load_assets(
