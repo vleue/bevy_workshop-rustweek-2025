@@ -1,6 +1,6 @@
 use bevy::{color::palettes, prelude::*};
 
-use crate::GameState;
+use crate::{GameState, audio::AudioStart};
 
 pub fn menu_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::StartMenu), display_title)
@@ -39,8 +39,13 @@ fn display_title(mut commands: Commands) {
     ));
 }
 
-fn start_game(keyboard: Res<ButtonInput<KeyCode>>, mut next: ResMut<NextState<GameState>>) {
+fn start_game(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut next: ResMut<NextState<GameState>>,
+    mut audio: EventWriter<AudioStart>,
+) {
     if keyboard.get_just_pressed().next().is_some() {
         next.set(GameState::Game);
+        audio.write(AudioStart::Start);
     }
 }

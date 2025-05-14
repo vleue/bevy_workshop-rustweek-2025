@@ -62,4 +62,10 @@ pub struct LoadedLevel {
 #[derive(Resource)]
 pub struct AudioAssets {
     pub laser: Handle<AudioSource>,
+    ship_explosion: Handle<AudioSource>,
+    asteroid_explosion: Handle<AudioSource>,
+    start: Handle<AudioSource>,
+    win: Handle<AudioSource>,
+    lose: Handle<AudioSource>,
+    game_loop: Handle<AudioSource>,
 }
