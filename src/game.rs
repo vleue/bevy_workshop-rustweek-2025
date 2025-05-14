@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 use rand::Rng;
 
-use crate::{GameAssets, GameState, LoadedLevel, level::Level};
+use crate::{GameAssets, GameState, LoadedLevel, audio::AudioStart, level::Level};
 
 pub fn game_plugin(app: &mut App) {
     app.add_input_context::<ShipController>()
@@ -219,6 +219,7 @@ fn fire_laser(
     time: Res<Time>,
     mut last_fired: Local<Duration>,
     game_assets: Res<GameAssets>,
+    mut audio: EventWriter<AudioStart>,
 ) -> Result {
     let mut transform = *player.get(trigger.target())?;
     transform.translation += transform.local_y() * 40.0;
@@ -237,6 +238,8 @@ fn fire_laser(
                 StateScoped(GameState::Game),
             ))
             .observe(laser_attack);
+        audio.write(AudioStart::Laser);
+
         *last_fired = time.elapsed();
     }
     Ok(())
