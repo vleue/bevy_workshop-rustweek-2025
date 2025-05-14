@@ -8,6 +8,7 @@ mod game;
 mod hud;
 mod level;
 mod splash;
+mod starfield;
 mod start_menu;
 mod won;
 
@@ -32,6 +33,7 @@ fn main() {
             hud::hud_plugin,
             won::won_plugin,
             audio::audio_plugin,
+            starfield::starfield_plugin,
         ))
         .run();
 }
