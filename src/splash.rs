@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{GameAssets, GameState, LoadedLevel};
+use crate::{AudioAssets, GameAssets, GameState, LoadedLevel};
 
 pub fn splash_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Splash), (display_title, load_assets))
@@ -64,5 +64,8 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
     commands.insert_resource(LoadedLevel {
         level: asset_server.load("level.bw"),
+    });
+    commands.insert_resource(AudioAssets {
+        laser: asset_server.load("laser.wav"),
     });
 }
