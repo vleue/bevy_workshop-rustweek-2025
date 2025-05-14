@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::EnhancedInputPlugin;
 use level::Level;
 
+mod audio;
 mod game;
 mod hud;
 mod level;
@@ -30,6 +31,7 @@ fn main() {
             level::level_loader_plugin,
             hud::hud_plugin,
             won::won_plugin,
+            audio::audio_plugin,
         ))
         .run();
 }
@@ -55,4 +57,9 @@ struct GameAssets {
 #[derive(Resource)]
 pub struct LoadedLevel {
     pub level: Handle<Level>,
+}
+
+#[derive(Resource)]
+pub struct AudioAssets {
+    pub laser: Handle<AudioSource>,
 }
