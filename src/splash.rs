@@ -67,5 +67,11 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
     commands.insert_resource(AudioAssets {
         laser: asset_server.load("laser.wav"),
+        ship_explosion: asset_server.load("ship_explosion.wav"),
+        asteroid_explosion: asset_server.load("asteroid_explosion.wav"),
+        start: asset_server.load("start.wav"),
+        win: asset_server.load("win.wav"),
+        lose: asset_server.load("lose.wav"),
+        game_loop: asset_server.load("Mission Plausible.wav"),
     });
 }

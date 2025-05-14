@@ -1,11 +1,11 @@
 use std::{f32::consts::TAU, time::Duration};
 
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use bevy_enhanced_input::prelude::*;
 use rand::Rng;
 
-use crate::{GameAssets, GameState, LoadedLevel, audio::AudioStart, level::Level};
+use crate::{AudioAssets, GameAssets, GameState, LoadedLevel, audio::AudioStart, level::Level};
 
 pub fn game_plugin(app: &mut App) {
     app.add_input_context::<ShipController>()
@@ -34,10 +34,17 @@ fn display_level(
     game_assets: Res<GameAssets>,
     loaded_level: Res<LoadedLevel>,
     levels: Res<Assets<Level>>,
+    audio_assets: Res<AudioAssets>,
 ) {
     let level = levels.get(&loaded_level.level).unwrap();
 
     commands.insert_resource(LivesRemaining(level.lives - 1));
+
+    commands.spawn((
+        AudioPlayer::<AudioSource>(audio_assets.game_loop.clone()),
+        PlaybackSettings::LOOP.with_volume(Volume::Decibels(-5.0)),
+        StateScoped(GameState::Game),
+    ));
 
     spawn_player(&mut commands, game_assets.as_ref(), Vec2::ZERO);
 
@@ -77,11 +84,13 @@ fn tick_explosion(
     mut next_state: ResMut<NextState<GameState>>,
     mut lives_remaining: ResMut<LivesRemaining>,
     game_assets: Res<GameAssets>,
+    mut audio: EventWriter<AudioStart>,
 ) {
     for (entity, mut timer, transform) in explosions.iter_mut() {
         if timer.0.tick(time.delta()).just_finished() {
             if lives_remaining.0 == 0 {
                 next_state.set(GameState::StartMenu);
+                audio.write(AudioStart::Lose);
             } else {
                 commands.entity(entity).despawn();
                 lives_remaining.0 -= 1;
@@ -194,6 +203,7 @@ fn asteroid_collision(
     player: Query<&Transform>,
     mut commands: Commands,
     game_assets: Res<GameAssets>,
+    mut audio: EventWriter<AudioStart>,
 ) -> Result {
     if is_asteroid.get(collision.collider).is_ok() {
         let transform = player.get(collision.target())?;
@@ -205,6 +215,7 @@ fn asteroid_collision(
         ));
         commands.entity(collision.target()).despawn();
         commands.entity(collision.collider).despawn();
+        audio.write(AudioStart::ShipExplosion);
     }
     Ok(())
 }
@@ -257,16 +268,23 @@ fn laser_attack(
     collision: Trigger<OnCollisionStart>,
     is_asteroid: Query<(), With<Asteroid>>,
     mut commands: Commands,
+    mut audio: EventWriter<AudioStart>,
 ) {
     if is_asteroid.get(collision.collider).is_ok() {
         commands.entity(collision.collider).despawn();
         commands.entity(collision.target()).despawn();
+        audio.write(AudioStart::AsteroidExplosion);
     }
 }
 
-fn has_won(asteroids: Query<(), With<Asteroid>>, mut next_state: ResMut<NextState<GameState>>) {
+fn has_won(
+    asteroids: Query<(), With<Asteroid>>,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut audio: EventWriter<AudioStart>,
+) {
     if asteroids.is_empty() {
         next_state.set(GameState::Won);
+        audio.write(AudioStart::Win);
     }
 }
 
