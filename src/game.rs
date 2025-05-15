@@ -1,12 +1,15 @@
 use std::{f32::consts::TAU, time::Duration};
 
-use avian2d::prelude::*;
 use bevy::{audio::Volume, prelude::*};
 use bevy_enhanced_input::prelude::*;
 use bevy_enoki::prelude::*;
+use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
-use crate::{AudioAssets, GameAssets, GameState, LoadedLevel, audio::AudioStart, level::Level};
+use crate::{
+    AudioAssets, GameAssets, GameState, LoadedLevel, audio::AudioStart, level::Level,
+    rapier_events::OnCollisionStart,
+};
 
 pub fn game_plugin(app: &mut App) {
     app.add_input_context::<ShipController>()
@@ -69,9 +72,11 @@ fn display_level(
             Sprite::from_image(game_assets.asteroid.clone()),
             Transform::from_xyz(x, y, 0.0),
             RigidBody::Dynamic,
-            Collider::circle(45.0),
-            LinearVelocity(Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0)),
-            AngularVelocity(rng.gen_range(-1.5..1.5)),
+            Collider::ball(45.0),
+            Velocity {
+                linvel: Vec2::from_angle(rng.gen_range(0.0..TAU)) * rng.gen_range(10.0..100.0),
+                angvel: rng.gen_range(-1.5..1.5),
+            },
             Asteroid,
             StateScoped(GameState::Game),
         ));
@@ -119,11 +124,16 @@ fn spawn_player(commands: &mut Commands, game_assets: &GameAssets, position: Vec
         .spawn((
             Sprite::from_image(game_assets.player_ship.clone()),
             RigidBody::Dynamic,
-            Collider::circle(40.0),
-            AngularDamping(5.0),
+            Collider::ball(40.0),
+            Damping {
+                linear_damping: 0.0,
+                angular_damping: 5.0,
+            },
+            // TODO: add automatically to RigidBody::dynamic ? otherwise it crashes
+            Velocity::zero(),
             Player,
             Transform::from_translation(position.extend(0.0)),
-            CollisionEventsEnabled,
+            ActiveEvents::COLLISION_EVENTS,
             StateScoped(GameState::Game),
             children![
                 (
@@ -167,27 +177,27 @@ struct FireLaser;
 
 fn rotate(
     trigger: Trigger<Fired<Rotate>>,
-    mut player: Query<&mut AngularVelocity>,
+    mut player: Query<&mut Velocity>,
     time: Res<Time>,
 ) -> Result {
     let fixed_rate = 0.2;
     let delta = time.delta().as_secs_f32();
     let rate = fixed_rate / (1.0 / (60.0 * delta));
     let mut angular_velocity = player.get_mut(trigger.target())?;
-    angular_velocity.0 += trigger.value.signum() * rate;
+    angular_velocity.angvel += trigger.value.signum() * rate;
 
     Ok(())
 }
 
 fn thrust(
     trigger: Trigger<Fired<Thrust>>,
-    mut player: Query<(&Transform, &mut LinearVelocity, &Children)>,
+    mut player: Query<(&Transform, &mut Velocity, &Children)>,
     mut visibility: Query<&mut Visibility>,
     mut particle_state: Query<&mut ParticleSpawnerState>,
 ) -> Result {
     let (transform, mut linear_velocity, children) = player.get_mut(trigger.target())?;
-    linear_velocity.0 += transform.local_y().xy() * 2.0;
-    linear_velocity.0 = linear_velocity.0.clamp_length_max(300.0);
+    linear_velocity.linvel += transform.local_y().xy() * 2.0;
+    linear_velocity.linvel = linear_velocity.linvel.clamp_length_max(300.0);
 
     visibility
         .get_mut(children[0])?
@@ -271,10 +281,13 @@ fn fire_laser(
                 },
                 transform,
                 RigidBody::Dynamic,
-                Collider::rectangle(4.0, 15.0),
-                LinearVelocity(transform.local_y().xy() * 1000.0),
+                Collider::cuboid(4.0, 15.0),
+                Velocity {
+                    linvel: (transform.local_y().xy() * 1000.0),
+                    angvel: 0.0,
+                },
                 Laser(Timer::from_seconds(1.0, TimerMode::Once)),
-                CollisionEventsEnabled,
+                ActiveEvents::COLLISION_EVENTS,
                 StateScoped(GameState::Game),
             ))
             .observe(laser_attack);
@@ -356,9 +369,10 @@ fn closest(
 
     let direction = distance.normalize();
     if distance.length() > 1000.0 {
-        commands
-            .entity(entity)
-            .insert(LinearVelocity(direction.normalize() * -100.0));
+        commands.entity(entity).insert(Velocity {
+            linvel: direction.normalize() * -100.0,
+            angvel: 0.0,
+        });
     }
     gizmos.arrow_2d(
         player_position + direction * 45.0,
