@@ -1,13 +1,18 @@
-use avian2d::{PhysicsPlugins, prelude::Gravity};
 use bevy::prelude::*;
 use bevy_enhanced_input::EnhancedInputPlugin;
 use bevy_enoki::{EnokiPlugin, Particle2dEffect};
+use bevy_rapier2d::{
+    math::Vect,
+    plugin::{RapierConfiguration, RapierContextInitialization, RapierPhysicsPlugin},
+    rapier::prelude::IntegrationParameters,
+};
 use level::Level;
 
 mod audio;
 mod game;
 mod hud;
 mod level;
+mod rapier_events;
 mod splash;
 mod starfield;
 mod start_menu;
@@ -25,8 +30,24 @@ fn main() {
         }))
         .init_state::<GameState>()
         .enable_state_scoped_entities::<GameState>()
-        .add_plugins((PhysicsPlugins::default(), EnhancedInputPlugin, EnokiPlugin))
-        .insert_resource(Gravity::ZERO)
+        .add_plugins((
+            RapierPhysicsPlugin::<()>::default().with_custom_initialization(
+                RapierContextInitialization::InitializeDefaultRapierContext {
+                    // TODO: impl default for RapierConfiguration
+                    rapier_configuration: RapierConfiguration {
+                        gravity: Vect::ZERO,
+                        physics_pipeline_active: true,
+                        query_pipeline_active: true,
+                        scaled_shape_subdivision: 10,
+                        force_update_from_transform_changes: false,
+                    },
+                    integration_parameters: IntegrationParameters::default(),
+                },
+            ),
+            EnhancedInputPlugin,
+            EnokiPlugin,
+        ))
+        //.insert_resource(Gravity::ZERO)
         .add_plugins((
             splash::splash_plugin,
             start_menu::menu_plugin,
@@ -36,6 +57,7 @@ fn main() {
             won::won_plugin,
             audio::audio_plugin,
             starfield::starfield_plugin,
+            rapier_events::plugin,
         ))
         .run();
 }
